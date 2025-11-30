@@ -1,0 +1,8 @@
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">监督举报板块</text>
+  </view>
+  <view class="content">
+    <text>监督举报功能开发中...</text>
+  </view>
+</view>

@@ -1,0 +1,67 @@
+<view class="container">
+  <!-- 顶部用户信息卡片 -->
+  <view class="user-card">
+    <view class="user-info">
+      <image class="user-avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}"></image>
+      <view class="user-details">
+        <text class="user-greeting">您好，</text>
+        <text class="user-nickname">{{userInfo.nickName || '微信用户'}}</text>
+        <text class="user-welcome">欢迎使用伴侣动物保护平台</text>
+      </view>
+    </view>
+    <view class="user-stats">
+      <view class="stat-item">
+        <text class="stat-number">4</text>
+        <text class="stat-label">可用功能</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能网格区域 -->
+  <view class="functions-grid">
+    <view class="grid-title">核心功能</view>
+    
+    <view class="grid-container">
+      <!-- 责任明晰板块 -->
+      <view class="function-card" bindtap="navigateToPage" data-page="responsibility">
+        <view class="card-icon responsibility">🔍</view>
+        <text class="card-title">责任明晰</text>
+        <text class="card-desc">明确动物保护责任</text>
+        <view class="card-badge">重要</view>
+      </view>
+
+      <!-- 资质查询板块 -->
+      <view class="function-card" bindtap="navigateToPage" data-page="qualification">
+        <view class="card-icon qualification">📋</view>
+        <text class="card-title">资质查询</text>
+        <text class="card-desc">查询相关资质信息</text>
+      </view>
+
+      <!-- 支持服务板块 -->
+      <view class="function-card" bindtap="navigateToPage" data-page="support">
+        <view class="card-icon support">💝</view>
+        <text class="card-title">支持服务</text>
+        <text class="card-desc">获取帮助与支持</text>
+      </view>
+
+      <!-- 监督举报板块 -->
+      <view class="function-card" bindtap="navigateToPage" data-page="report">
+        <view class="card-icon report">📢</view>
+        <text class="card-title">监督举报</text>
+        <text class="card-desc">举报违规行为</text>
+        <view class="card-badge urgent">紧急</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 平台公告区域 -->
+  <view class="announcement">
+    <view class="announcement-header">
+      <text class="announcement-title">平台公告</text>
+      <text class="announcement-more">更多</text>
+    </view>
+    <view class="announcement-content">
+      <text class="announcement-text">🔔 伴侣动物保护平台已正式上线，欢迎使用各项功能</text>
+    </view>
+  </view>
+</view>

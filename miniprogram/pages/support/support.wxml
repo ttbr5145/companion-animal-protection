@@ -1,0 +1,8 @@
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">支持服务板块</text>
+  </view>
+  <view class="content">
+    <text>支持服务功能开发中...</text>
+  </view>
+</view>

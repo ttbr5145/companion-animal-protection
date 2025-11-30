@@ -1,0 +1,52 @@
+{
+    "pages": [
+      "pages/login/login",
+      "pages/index/index",
+      "pages/function/function",
+      "pages/dynamic/dynamic",
+      "pages/profile/profile",
+      "pages/responsibility/responsibility",
+      "pages/qualification/qualification",
+      "pages/support/support",
+      "pages/report/report",
+      "pages/about/about",
+      "pages/updateProfile/updateProfile"
+    ],
+    "window": {
+      "navigationBarTitleText": "伴侣动物保护平台",
+      "navigationBarBackgroundColor": "#4CAF50",
+      "navigationBarTextStyle": "white",
+      "backgroundColor": "#f5f5f5"
+    },
+    "tabBar": {
+        "color": "#666666",
+        "selectedColor": "#4CAF50",
+        "backgroundColor": "#ffffff",
+        "borderStyle": "black",
+        "list": [
+            {
+                "pagePath": "pages/function/function",
+                "text": "功能",
+                "iconPath": "images/tabbar/应用.png",
+                "selectedIconPath": "images/tabbar/应用.png"
+            },
+            {
+                "pagePath": "pages/dynamic/dynamic",
+                "text": "动态", 
+                "iconPath": "images/tabbar/发现.png",
+                "selectedIconPath": "images/tabbar/发现.png"
+            },
+            {
+                "pagePath": "pages/profile/profile",
+                "text": "我的",
+                "iconPath": "images/tabbar/客户管理.png",
+                "selectedIconPath": "images/tabbar/客户管理.png"
+            }
+        ]
+    },
+    "permission": {
+      "scope.userInfo": {
+        "desc": "用于完善会员资料"
+      }
+    }
+  }

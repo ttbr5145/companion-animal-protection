@@ -1,0 +1,194 @@
+.container {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #f5f5f5 0%, #e8f5e8 100%);
+    padding: 40rpx 30rpx;
+  }
+  
+  /* 头部标题区域 */
+  .header {
+    text-align: center;
+    margin-bottom: 40rpx;
+    padding: 40rpx 0;
+  }
+  
+  .title {
+    display: block;
+    font-size: 48rpx;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 16rpx;
+  }
+  
+  .subtitle {
+    display: block;
+    font-size: 28rpx;
+    color: #7f8c8d;
+  }
+  
+  /* 内容卡片 */
+  .content-card {
+    background: white;
+    border-radius: 20rpx;
+    padding: 40rpx 30rpx;
+    box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+    margin-bottom: 40rpx;
+  }
+  
+  /* 分区样式 */
+  .section {
+    margin-bottom: 50rpx;
+  }
+  
+  .section:last-child {
+    margin-bottom: 0;
+  }
+  
+  .section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30rpx;
+    padding-bottom: 20rpx;
+    border-bottom: 2rpx solid #f0f0f0;
+  }
+  
+  .section-icon {
+    font-size: 40rpx;
+    margin-right: 20rpx;
+  }
+  
+  .section-title {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  
+  /* 平台简介 */
+  .section-content {
+    padding: 0 10rpx;
+  }
+  
+  .description {
+    font-size: 28rpx;
+    color: #5a6c7d;
+    line-height: 1.6;
+    text-align: justify;
+  }
+  
+  /* 信息列表 */
+  .info-list {
+    padding: 0 10rpx;
+  }
+  
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25rpx 0;
+    border-bottom: 1rpx solid #f8f9fa;
+  }
+  
+  .info-item:last-child {
+    border-bottom: none;
+  }
+  
+  .info-label {
+    font-size: 28rpx;
+    color: #666;
+    font-weight: 500;
+  }
+  
+  .info-value {
+    font-size: 28rpx;
+    color: #2c3e50;
+    font-weight: 600;
+  }
+  
+  /* 联系方式 */
+  .contact-info {
+    padding: 0 10rpx;
+  }
+  
+  .contact-text {
+    display: block;
+    font-size: 28rpx;
+    color: #5a6c7d;
+    margin-bottom: 30rpx;
+    line-height: 1.5;
+  }
+  
+  .phone-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    padding: 30rpx;
+    border-radius: 15rpx;
+    margin-bottom: 20rpx;
+    box-shadow: 0 4rpx 15rpx rgba(76, 175, 80, 0.3);
+  }
+  
+  .phone-icon {
+    font-size: 40rpx;
+    margin-right: 20rpx;
+    color: white;
+  }
+  
+  .phone-number {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: white;
+    letter-spacing: 2rpx;
+  }
+  
+  .contact-note {
+    display: block;
+    font-size: 24rpx;
+    color: #999;
+    text-align: center;
+    font-style: italic;
+  }
+  
+  /* 版本信息 */
+  .version-section {
+    text-align: center;
+    padding-top: 40rpx;
+    border-top: 1rpx solid #f0f0f0;
+    margin-top: 40rpx;
+  }
+  
+  .version-text {
+    display: block;
+    font-size: 26rpx;
+    color: #7f8c8d;
+    margin-bottom: 10rpx;
+  }
+  
+  .copyright {
+    display: block;
+    font-size: 22rpx;
+    color: #bdc3c7;
+  }
+  
+  /* 返回按钮 */
+  .back-section {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .back-btn {
+    width: 600rpx;
+    height: 80rpx;
+    background: linear-gradient(135deg, #FFA500, #FF8C00);
+    color: white;
+    border: none;
+    border-radius: 40rpx;
+    font-size: 28rpx;
+    font-weight: 500;
+    box-shadow: 0 4rpx 15rpx rgba(255, 165, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .back-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 2rpx 8rpx rgba(255, 165, 0, 0.4);
+  }

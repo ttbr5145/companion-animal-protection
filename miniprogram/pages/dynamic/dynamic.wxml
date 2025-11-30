@@ -1,0 +1,7 @@
+<view class="container">
+  <view class="empty-state">
+    <view class="empty-icon">📊</view>
+    <text class="empty-text">动态板块</text>
+    <text class="empty-subtext">功能开发中，敬请期待</text>
+  </view>
+</view>

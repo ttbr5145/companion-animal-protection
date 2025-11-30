@@ -1,0 +1,24 @@
+<view class="login-container">
+  <view class="logo">
+    <text class="logo-text">伴侣动物保护平台</text>
+  </view>
+  
+  <view class="welcome">
+    <text>欢迎使用伴侣动物保护平台</text>
+  </view>
+  
+  <view class="login-btn-container">
+    <button 
+      class="wechat-login-btn" 
+      open-type="getUserInfo" 
+      bindgetuserinfo="onGetUserInfo"
+      bindtap="onWeChatLogin"
+    >
+      微信一键登录
+    </button>
+  </view>
+  
+  <view class="tip">
+    <text>登录即代表同意《用户协议》和《隐私政策》</text>
+  </view>
+</view>

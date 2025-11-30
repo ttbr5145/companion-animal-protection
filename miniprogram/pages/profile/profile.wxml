@@ -1,0 +1,155 @@
+<view class="container">
+  <!-- 顶部用户信息区域 - 黄色背景 -->
+  <view class="user-header">
+    <view class="user-info-section">
+      <image class="user-avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}"></image>
+      <view class="user-details">
+        <text class="user-nickname">{{userInfo.nickName || '微信用户'}}</text>
+        <text class="user-level">动物保护志愿者</text>
+      </view>
+      <button class="checkin-btn" bindtap="handleCheckin">打卡</button>
+    </view>
+    
+    <!-- 数据统计 -->
+    <view class="stats-section">
+      <view class="stat-item">
+        <text class="stat-number">{{checkinDays}}</text>
+        <text class="stat-label">连续打卡</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">{{protectionDays}}</text>
+        <text class="stat-label">保护天数</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">{{rescueCount}}</text>
+        <text class="stat-label">救助数量</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 注册志愿者横幅 -->
+  <view class="volunteer-banner" bindtap="registerAsVolunteer">
+    <view class="volunteer-content">
+      <text class="volunteer-title">注册为伴侣动物保护志愿者</text>
+      <text class="volunteer-desc">加入我们，共同保护伴侣动物</text>
+    </view>
+    <view class="volunteer-action">
+      <text class="volunteer-action-text">立即注册</text>
+      <view class="arrow">›</view>
+    </view>
+  </view>
+
+  <!-- 图标导航网格 -->
+  <view class="icon-grid">
+    <view class="grid-item" bindtap="navigateToMessage">
+      <view class="grid-icon">💬</view>
+      <text class="grid-text">消息</text>
+    </view>
+    <view class="grid-item" bindtap="navigateToBadges">
+      <view class="grid-icon">🏅</view>
+      <text class="grid-text">我的徽章</text>
+    </view>
+    <view class="grid-item" bindtap="navigateToPoints">
+      <view class="grid-icon">⭐</view>
+      <text class="grid-text">我的积分</text>
+    </view>
+    <view class="grid-item" bindtap="navigateToInvite">
+      <view class="grid-icon">👥</view>
+      <text class="grid-text">邀请好友</text>
+    </view>
+    <view class="grid-item" bindtap="navigateToSettings">
+      <view class="grid-icon">⚙️</view>
+      <text class="grid-text">设置</text>
+    </view>
+  </view>
+
+  <!-- 功能列表 - 全屏宽度 -->
+  <view class="function-list">
+    <view class="list-section">
+      <view class="list-item full-width" bindtap="navigateToAnimalRecords">
+        <view class="item-icon">📒</view>
+        <text class="item-text">动物档案</text>
+        <view class="item-arrow">›</view>
+      </view>
+      <view class="list-item full-width" bindtap="navigateToFamilyPets">
+        <view class="item-icon">🏠</view>
+        <text class="item-text">家庭宠物</text>
+        <view class="item-arrow">›</view>
+      </view>
+      <view class="list-item full-width" bindtap="navigateToSettings">
+        <view class="item-icon">⚙️</view>
+        <text class="item-text">设置</text>
+        <view class="item-arrow">›</view>
+      </view>
+    </view>
+    
+    <view class="list-section">
+      <view class="list-item full-width" bindtap="updateProfile">
+        <view class="item-icon">👤</view>
+        <text class="item-text">修改个人信息</text>
+        <view class="item-arrow">›</view>
+      </view>
+      <view class="list-item full-width" bindtap="bindPhone">
+        <view class="item-icon">📱</view>
+        <text class="item-text">绑定手机号</text>
+        <view class="item-arrow">›</view>
+      </view>
+    </view>
+    
+    <view class="list-section">
+      <view class="list-item full-width" bindtap="navigateToHelp">
+        <view class="item-icon">❓</view>
+        <text class="item-text">使用帮助</text>
+        <view class="item-arrow">›</view>
+      </view>
+      <view class="list-item full-width" bindtap="navigateToFeedback">
+        <view class="item-icon">💬</view>
+        <text class="item-text">意见反馈</text>
+        <view class="item-arrow">›</view>
+      </view>
+    </view>
+    
+    <view class="list-section">
+      <view class="list-item full-width" bindtap="navigateToAbout">
+        <view class="item-icon">ℹ️</view>
+        <text class="item-text">关于伴侣动物保护平台</text>
+        <view class="item-arrow">›</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 退出登录按钮 -->
+  <view class="logout-section">
+    <button class="logout-btn" bindtap="showLogoutConfirm">退出登录</button>
+  </view>
+
+  <!-- 版本信息 -->
+  <view class="version-info">
+    <text class="version-text">伴侣动物保护平台 v1.0.0</text>
+  </view>
+
+  <!-- 底部TabBar占位 -->
+  <view class="tabbar-placeholder"></view>
+</view>
+
+<!-- 退出确认模态框 -->
+<view class="modal" wx:if="{{showLogoutModal}}">
+  <view class="modal-mask" bindtap="hideLogoutModal"></view>
+  <view class="modal-content">
+    <view class="modal-header">
+      <text class="modal-title">确认退出</text>
+    </view>
+    <view class="modal-body">
+      <text class="modal-text">确定要退出登录吗？</text>
+    </view>
+    <view class="modal-footer">
+      <button class="modal-btn cancel" bindtap="hideLogoutModal">取消</button>
+      <button class="modal-btn confirm" bindtap="logout">确定退出</button>
+    </view>
+  </view>
+</view>
+
+<!-- 打卡成功提示 -->
+<view class="checkin-toast" wx:if="{{showCheckinToast}}">
+  <text class="checkin-text">打卡成功！连续打卡{{checkinDays}}天</text>
+</view>

@@ -1,0 +1,45 @@
+<view class="home-container">
+  <!-- 顶部用户信息 -->
+  <view class="user-header">
+    <view class="user-info">
+      <image class="user-avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}"></image>
+      <text class="user-nickname">{{userInfo.nickName || '用户'}}</text>
+    </view>
+  </view>
+
+  <!-- 四大功能板块 -->
+  <view class="function-grid">
+    <view class="grid-row">
+      <view class="function-card" bindtap="navigateToResponsibility">
+        <view class="card-icon">🔍</view>
+        <text class="card-title">责任明晰板块</text>
+        <text class="card-desc">了解养宠责任与义务</text>
+      </view>
+      
+      <view class="function-card" bindtap="navigateToQualification">
+        <view class="card-icon">📋</view>
+        <text class="card-title">资质查询板块</text>
+        <text class="card-desc">查询服务机构资质</text>
+      </view>
+    </view>
+    
+    <view class="grid-row">
+      <view class="function-card" bindtap="navigateToSupport">
+        <view class="card-icon">💝</view>
+        <text class="card-title">支持服务板块</text>
+        <text class="card-desc">获取养宠支持服务</text>
+      </view>
+      
+      <view class="function-card" bindtap="navigateToReport">
+        <view class="card-icon">📞</view>
+        <text class="card-title">监督举报板块</text>
+        <text class="card-desc">举报违规行为</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部退出按钮 -->
+  <view class="logout-section">
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+</view>

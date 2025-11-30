@@ -1,0 +1,42 @@
+<!--index.wxml-->
+<view class="container">
+  <!-- 顶部用户信息栏 -->
+  <view class="user-header">
+    <view class="user-info">
+      <image class="user-avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}"></image>
+      <text class="user-nickname">{{userInfo.nickName || '用户'}}</text>
+    </view>
+  </view>
+
+  <!-- 中央功能按钮区域 -->
+  <view class="main-buttons">
+    <view class="button-row">
+      <button class="function-btn" bindtap="navigateToPage" data-page="responsibility">
+        <view class="btn-icon">🔍</view>
+        <text class="btn-text">责任明晰板块</text>
+      </button>
+      
+      <button class="function-btn" bindtap="navigateToPage" data-page="qualification">
+        <view class="btn-icon">📋</view>
+        <text class="btn-text">资质查询板块</text>
+      </button>
+    </view>
+    
+    <view class="button-row">
+      <button class="function-btn" bindtap="navigateToPage" data-page="support">
+        <view class="btn-icon">💝</view>
+        <text class="btn-text">支持服务板块</text>
+      </button>
+      
+      <button class="function-btn" bindtap="navigateToPage" data-page="report">
+        <view class="btn-icon">📢</view>
+        <text class="btn-text">监督举报板块</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 退出登录按钮 -->
+  <view class="logout-section">
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+</view>

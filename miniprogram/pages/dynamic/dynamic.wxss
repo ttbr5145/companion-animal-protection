@@ -1,0 +1,31 @@
+.container {
+    min-height: 100vh;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 60rpx;
+  }
+  
+  .empty-icon {
+    font-size: 120rpx;
+    margin-bottom: 40rpx;
+    display: block;
+  }
+  
+  .empty-text {
+    font-size: 36rpx;
+    color: #333;
+    display: block;
+    margin-bottom: 20rpx;
+  }
+  
+  .empty-subtext {
+    font-size: 28rpx;
+    color: #666;
+    display: block;
+  }

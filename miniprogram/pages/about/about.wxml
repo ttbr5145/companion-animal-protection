@@ -1,0 +1,70 @@
+<view class="container">
+  <!-- 顶部标题区域 -->
+  <view class="header">
+    <text class="title">关于我们</text>
+    <text class="subtitle">伴侣动物保护平台</text>
+  </view>
+
+  <!-- 主要内容卡片 -->
+  <view class="content-card">
+    <!-- 平台简介 -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-icon">🐾</text>
+        <text class="section-title">平台简介</text>
+      </view>
+      <view class="section-content">
+        <text class="description">
+          伴侣动物保护平台致力于为伴侣动物提供全面的保护与服务，
+          通过责任明晰、资质查询、支持服务和监督举报等功能模块，
+          构建完善的动物保护生态系统。
+        </text>
+      </view>
+    </view>
+
+    <!-- 团队信息 -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-icon">👥</text>
+        <text class="section-title">团队信息</text>
+      </view>
+      <view class="info-list">
+        <view class="info-item">
+          <text class="info-label">组织者</text>
+          <text class="info-value">俞李依</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">开发者</text>
+          <text class="info-value">吴桐</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 联系方式 -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-icon">📞</text>
+        <text class="section-title">联系反馈</text>
+      </view>
+      <view class="contact-info">
+        <text class="contact-text">如有任何问题或建议，请联系我们：</text>
+        <view class="phone-section">
+          <text class="phone-icon">📱</text>
+          <text class="phone-number">18098695953</text>
+        </view>
+        <text class="contact-note">我们将尽快为您解答和处理</text>
+      </view>
+    </view>
+
+    <!-- 版本信息 -->
+    <view class="version-section">
+      <text class="version-text">版本号 1.0.0</text>
+      <text class="copyright">© 2025 伴侣动物保护平台 版权所有</text>
+    </view>
+  </view>
+
+  <!-- 返回按钮 -->
+  <view class="back-section">
+    <button class="back-btn" bindtap="goBack">返回</button>
+  </view>
+</view>
