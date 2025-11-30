@@ -1,5 +1,4 @@
 // miniprogram/app.js
-// Written by wt
 App({
     onLaunch: function () {
       // 初始化云开发
