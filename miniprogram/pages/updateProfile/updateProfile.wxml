@@ -3,7 +3,7 @@
   <view class="header">
     <view class="header-back" bindtap="goBack">‹</view>
     <text class="header-title">修改个人信息</text>
-    <view class="header-save" bindtap="saveProfile">保存</view>
+    <!-- 已移除顶部保存按钮 -->
   </view>
 
   <!-- 头像修改区域 -->

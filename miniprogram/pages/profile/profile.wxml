@@ -7,7 +7,12 @@
         <text class="user-nickname">{{userInfo.nickName || '微信用户'}}</text>
         <text class="user-level">动物保护志愿者</text>
       </view>
-      <button class="checkin-btn" bindtap="handleCheckin">打卡</button>
+      <!-- 修改打卡按钮，根据状态动态变化 -->
+      <button class="checkin-btn {{checkinButtonDisabled ? 'checkin-btn-disabled' : ''}}" 
+              bindtap="handleCheckin"
+              disabled="{{checkinButtonDisabled}}">
+        {{checkinButtonText}}
+      </button>
     </view>
     
     <!-- 数据统计 -->
@@ -151,5 +156,5 @@
 
 <!-- 打卡成功提示 -->
 <view class="checkin-toast" wx:if="{{showCheckinToast}}">
-  <text class="checkin-text">打卡成功！连续打卡{{checkinDays}}天</text>
+    <text class="checkin-text">打卡成功！连续打卡{{checkinDays}}天</text>
 </view>

@@ -429,3 +429,37 @@
 .checkin-text {
     font-size: 28rpx;
 }
+
+/* 打卡按钮禁用状态 */
+.checkin-btn-disabled {
+    background: rgba(255, 255, 255, 0.6) !important;
+    color: #ccc !important;
+    opacity: 0.7;
+}
+
+.checkin-btn:disabled {
+    background: rgba(255, 255, 255, 0.6) !important;
+    color: #ccc !important;
+    opacity: 0.7;
+}
+
+/* 打卡成功提示优化 */
+.checkin-toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 30rpx 60rpx;
+    border-radius: 50rpx;
+    z-index: 1000;
+    box-shadow: 0 8rpx 30rpx rgba(76, 175, 80, 0.4);
+    border: 2rpx solid #4CAF50;
+}
+
+.checkin-text {
+    font-size: 32rpx;
+    font-weight: bold;
+    text-align: center;
+}
