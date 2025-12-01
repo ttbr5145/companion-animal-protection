@@ -1,0 +1,216 @@
+<view class="post-detail-container">
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{isLoading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 主要内容区域 -->
+  <scroll-view wx:else scroll-y class="content-scroll" bindscrolltolower="onReachBottom" enhanced="{{true}}" show-scrollbar="{{false}}">
+    
+    <!-- 帖子头部信息 -->
+    <view class="post-header">
+      <view class="header-main">
+        <view class="title-section">
+          <text class="post-type-badge {{post.postType}}">
+            {{post.postType === 'support' ? '🤝 支持服务' : '⚠️ 监督举报'}}
+          </text>
+          <text class="post-title">{{post.title}}</text>
+        </view>
+        
+        <view class="meta-info">
+          <view class="author-info">
+            <image class="author-avatar" src="{{post.author.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill" lazy-load></image>
+            <view class="author-details">
+              <text class="author-name">{{post.author.nickName || '微信用户'}}</text>
+              <text class="post-time">{{formatTime(post.createdAt)}}</text>
+            </view>
+          </view>
+          
+          <!-- 状态管理（仅帖主可见） -->
+          <view class="status-section" wx:if="{{isAuthor}}">
+            <view class="current-status {{post.status}}">
+              <text class="status-text">{{post.status === 'completed' ? '✅ 已处理' : '🕒 进行中'}}</text>
+            </view>
+            <button class="status-edit-btn" bindtap="showStatusModal">更改状态</button>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 帖子内容区域 -->
+    <view class="post-content-section">
+      <view class="content-text">
+        <text class="content-body">{{post.content}}</text>
+      </view>
+
+      <!-- 图片展示 -->
+      <view class="images-grid" wx:if="{{post.images && post.images.length > 0}}">
+        <block wx:for="{{post.images}}" wx:key="*this" wx:for-item="imgUrl" wx:for-index="imgIndex">
+          <image class="content-image {{post.images.length === 1 ? 'single-image' : 'multi-image'}}" 
+                 src="{{imgUrl}}" mode="aspectFill" lazy-load
+                 bindtap="previewImage" data-images="{{post.images}}" data-index="{{imgIndex}}"/>
+        </block>
+      </view>
+
+      <!-- 位置信息 -->
+      <view class="location-info" wx:if="{{post.location}}">
+        <view class="location-header">
+          <text class="location-icon">📍</text>
+          <text class="location-title">位置信息</text>
+        </view>
+        <text class="location-name">{{post.location.name}}</text>
+        <text class="location-address" wx:if="{{post.location.address}}">{{post.location.address}}</text>
+        <button class="view-location-btn" bindtap="viewOnMap">查看地图</button>
+      </view>
+    </view>
+
+    <!-- 数据统计 -->
+    <view class="stats-bar">
+      <view class="stat-item">
+        <text class="stat-icon">👁️</text>
+        <text class="stat-count">{{post.viewCount || 0}}</text>
+        <text class="stat-label">浏览</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-icon">❤️</text>
+        <text class="stat-count">{{post.likeCount || 0}}</text>
+        <text class="stat-label">点赞</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-icon">💬</text>
+        <text class="stat-count">{{post.commentCount || 0}}</text>
+        <text class="stat-label">评论</text>
+      </view>
+    </view>
+
+    <!-- 评论区域 -->
+    <view class="comments-section">
+      <view class="section-header">
+        <text class="section-title">评论（{{comments.length}}）</text>
+        <view class="sort-options">
+          <text class="sort-option {{sortBy === 'time' ? 'active' : ''}}" 
+                bindtap="setSort" data-sort="time">最新</text>
+          <text class="sort-option {{sortBy === 'hot' ? 'active' : ''}}" 
+                bindtap="setSort" data-sort="hot">最热</text>
+        </view>
+      </view>
+
+      <!-- 评论列表 -->
+      <view class="comments-list">
+        <block wx:for="{{comments}}" wx:key="_id" wx:for-item="comment" wx:for-index="commentIndex">
+          <view class="comment-item">
+            <image class="comment-avatar" src="{{comment.author.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+            <view class="comment-content">
+              <view class="comment-header">
+                <text class="comment-author">{{comment.author.nickName || '微信用户'}}</text>
+                <text class="comment-time">{{formatTime(comment.createdAt)}}</text>
+                <text class="comment-author-badge" wx:if="{{comment.isAuthor}}">作者</text>
+              </view>
+              <text class="comment-text">{{comment.content}}</text>
+              
+              <!-- 评论图片 -->
+              <view class="comment-images" wx:if="{{comment.images && comment.images.length > 0}}">
+                <block wx:for="{{comment.images}}" wx:key="*this" wx:for-item="commentImg" wx:for-index="commentImgIndex">
+                  <image class="comment-image" src="{{commentImg}}" mode="aspectFill" lazy-load
+                         bindtap="previewImage" data-images="{{comment.images}}" data-index="{{commentImgIndex}}"></image>
+                </block>
+              </view>
+              
+              <!-- 评论操作 -->
+              <view class="comment-actions">
+                <view class="action-item {{comment.liked ? 'liked' : ''}}" 
+                      bindtap="likeComment" data-comment-index="{{commentIndex}}">
+                  <text class="action-icon">{{comment.liked ? '❤️' : '🤍'}}</text>
+                  <text class="action-count">{{comment.likeCount || 0}}</text>
+                </view>
+                <text class="action-reply" bindtap="showReplyInput" data-comment-index="{{commentIndex}}">回复</text>
+                <text class="action-delete" wx:if="{{comment.author.openid === userOpenid}}" 
+                      bindtap="deleteComment" data-comment-index="{{commentIndex}}">删除</text>
+              </view>
+            </view>
+          </view>
+        </block>
+        
+        <!-- 空状态 -->
+        <view class="empty-comments" wx:if="{{comments.length === 0}}">
+          <text class="empty-icon">💬</text>
+          <text class="empty-text">暂无评论，快来抢沙发吧~</text>
+        </view>
+      </view>
+      
+      <!-- 加载更多 -->
+      <view class="load-more" wx:if="{{hasMoreComments && !isLoadingComments}}" bindtap="loadMoreComments">
+        <text>加载更多评论</text>
+      </view>
+      
+      <view class="load-more" wx:if="{{isLoadingComments}}">
+        <text>加载中...</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 底部操作栏 -->
+  <view class="action-bar">
+    <view class="action-left">
+      <view class="action-btn {{post.liked ? 'liked' : ''}}" bindtap="toggleLike">
+        <text class="btn-icon">{{post.liked ? '❤️' : '🤍'}}</text>
+        <text class="btn-text">点赞</text>
+      </view>
+      <view class="action-btn" bindtap="focusCommentInput">
+        <text class="btn-icon">💬</text>
+        <text class="btn-text">评论</text>
+      </view>
+    </view>
+    
+    <view class="comment-input-wrapper">
+      <input class="comment-input" placeholder="说点什么吧..." 
+             value="{{commentText}}" bindinput="onCommentInput" 
+             bindconfirm="submitComment" focus="{{isInputFocus}}"/>
+      <button class="send-btn" bindtap="submitComment" disabled="{{!commentText}}">发送</button>
+    </view>
+  </view>
+
+  <!-- 图片选择面板 -->
+  <view class="image-panel" wx:if="{{showImagePanel}}">
+    <view class="panel-header">
+      <text class="panel-title">添加图片</text>
+      <text class="panel-close" bindtap="hideImagePanel">×</text>
+    </view>
+    <view class="image-options">
+      <view class="image-option" bindtap="chooseImage">
+        <text class="option-icon">📷</text>
+        <text class="option-text">相册</text>
+      </view>
+      <view class="image-option" bindtap="takePhoto">
+        <text class="option-icon">📸</text>
+        <text class="option-text">拍照</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 状态修改模态框 -->
+  <view class="modal-mask" wx:if="{{showStatusModal}}" bindtap="hideStatusModal">
+    <view class="modal-content" catchtap>
+      <view class="modal-header">
+        <text class="modal-title">修改帖子状态</text>
+      </view>
+      <view class="modal-body">
+        <view class="status-option {{post.status === 'pending' ? 'active' : ''}}" 
+              bindtap="changeStatus" data-status="pending">
+          <text class="status-radio">{{post.status === 'pending' ? '●' : '○'}}</text>
+          <text class="status-label">🕒 进行中</text>
+        </view>
+        <view class="status-option {{post.status === 'completed' ? 'active' : ''}}" 
+              bindtap="changeStatus" data-status="completed">
+          <text class="status-radio">{{post.status === 'completed' ? '●' : '○'}}</text>
+          <text class="status-label">✅ 已处理</text>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="modal-btn cancel" bindtap="hideStatusModal">取消</button>
+        <button class="modal-btn confirm" bindtap="confirmStatusChange">确定</button>
+      </view>
+    </view>
+  </view>
+</view>

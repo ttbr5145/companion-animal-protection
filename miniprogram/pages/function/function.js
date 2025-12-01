@@ -31,30 +31,52 @@ Page({
       }
     },
   
-    // 跳转到功能页面
+    // 跳转到功能页面 - 已修复
     navigateToPage: function (e) {
-      const page = e.currentTarget.dataset.page;
-      const pageMap = {
-        'responsibility': '/pages/responsibility/responsibility',
-        'qualification': '/pages/qualification/qualification',
-        'support': '/pages/support/support',
-        'report': '/pages/report/report'
-      };
+      const page = e.currentTarget.dataset.page; // 正确获取页面类型
       
       // 添加点击反馈
       wx.vibrateShort({ type: 'light' });
       
-      if (pageMap[page]) {
+      // 对 support 和 report 进行特殊处理，跳转到统一的发帖页面
+      if (page === 'support' || page === 'report') {
         wx.navigateTo({
-          url: pageMap[page],
+          url: `/pages/postEdit/postEdit?type=${page}`, // 携带类型参数
           fail: (err) => {
-            console.error('页面跳转失败:', err);
+            console.error('跳转到发帖页失败:', err);
             wx.showToast({
-              title: '功能开发中',
-              icon: 'none'
+              title: '页面不存在或未注册',
+              icon: 'none',
+              duration: 2000
             });
           }
         });
+      } else {
+        // 其他功能（如responsibility, qualification）保持原有跳转逻辑
+        const pageMap = {
+          'responsibility': '/pages/responsibility/responsibility',
+          'qualification': '/pages/qualification/qualification'
+        };
+        
+        if (pageMap[page]) {
+          wx.navigateTo({
+            url: pageMap[page],
+            fail: (err) => {
+              console.error('页面跳转失败:', err);
+              wx.showToast({
+                title: '功能暂未开放',
+                icon: 'none',
+                duration: 2000
+              });
+            }
+          });
+        } else {
+          wx.showToast({
+            title: '功能不存在',
+            icon: 'none',
+            duration: 2000
+          });
+        }
       }
     },
   
@@ -68,4 +90,4 @@ Page({
         wx.stopPullDownRefresh();
       }, 1000);
     }
-  });
+});

@@ -1,7 +1,118 @@
-<view class="container">
-  <view class="empty-state">
-    <view class="empty-icon">📊</view>
-    <text class="empty-text">动态板块</text>
-    <text class="empty-subtext">功能开发中，敬请期待</text>
+<view class="dynamic-container">
+  <!-- 顶部选项卡 - 美化版 -->
+  <view class="tab-bar">
+    <view class="tab-item {{currentTab === 'all' ? 'active' : ''}}" 
+          bindtap="switchTab" data-tab="all">
+      <text class="tab-text">全部</text>
+      <view class="tab-indicator"></view>
+    </view>
+    <view class="tab-item {{currentTab === 'support' ? 'active' : ''}}" 
+          bindtap="switchTab" data-tab="support">
+      <text class="tab-text">支持服务</text>
+      <view class="tab-indicator"></view>
+    </view>
+    <view class="tab-item {{currentTab === 'report' ? 'active' : ''}}" 
+          bindtap="switchTab" data-tab="report">
+      <text class="tab-text">监督举报</text>
+      <view class="tab-indicator"></view>
+    </view>
+  </view>
+
+  <!-- 帖子列表 -->
+  <scroll-view class="posts-list" scroll-y bindscrolltolower="onReachBottom" enhanced="{{true}}" show-scrollbar="{{false}}">
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{posts.length === 0 && !isLoading}}">
+      <text class="empty-icon">📝</text>
+      <text class="empty-text">暂无动态</text>
+      <text class="empty-subtext">快来发布第一条帖子吧</text>
+      <button class="empty-btn" bindtap="createPost">立即发布</button>
+    </view>
+
+    <!-- 帖子列表 -->
+    <block wx:for="{{posts}}" wx:key="_id">
+      <view class="post-card" bindtap="viewPostDetail" data-post="{{item}}">
+        <!-- 帖子头部 -->
+        <view class="post-header">
+          <view class="user-info">
+            <image class="user-avatar" src="{{item.author.avatarUrl || '/images/default-avatar.png'}}" lazy-load></image>
+            <view class="user-meta">
+              <text class="user-name">{{item.author.nickName || '微信用户'}}</text>
+              <text class="post-time">{{formatTime(item.createdAt)}}</text>
+            </view>
+          </view>
+          <view class="post-type-badge {{item.postType}}">
+            {{item.postType === 'support' ? '🤝 支持' : '⚠️ 举报'}}
+          </view>
+        </view>
+
+        <!-- 状态标签（帖主可见） -->
+        <view class="status-badge" wx:if="{{item._openid === userOpenid}}">
+          <text class="status-text {{item.status === 'completed' ? 'completed' : 'pending'}}">
+            {{item.status === 'completed' ? '✅ 已处理' : '🕒 进行中'}}
+          </text>
+          <text class="status-edit" bindtap="changeStatus" data-post="{{item}}" catchtap>更改</text>
+        </view>
+
+        <!-- 帖子内容 -->
+        <view class="post-content">
+          <text class="post-title">{{item.title}}</text>
+          <text class="post-desc">{{item.content}}</text>
+          
+          <!-- 图片展示 -->
+          <view class="post-images" wx:if="{{item.images && item.images.length > 0}}">
+            <block wx:for="{{item.images}}" wx:key="*this" wx:for-item="imageUrl">
+              <image class="post-image {{item.images.length === 1 ? 'single-image' : ''}}" 
+                     src="{{imageUrl}}" mode="aspectFill" lazy-load
+                     data-images="{{item.images}}" data-index="{{index}}" 
+                     bindtap="previewImage" catchtap></image>
+            </block>
+          </view>
+
+          <!-- 位置信息 -->
+          <view class="post-location" wx:if="{{item.location}}">
+            <text class="location-icon">📍</text>
+            <text class="location-text">{{item.location.name}}</text>
+          </view>
+        </view>
+
+        <!-- 帖子操作栏 -->
+        <view class="post-actions">
+          <view class="action-item {{item.liked ? 'liked' : ''}}" bindtap="likePost" data-post="{{item}}" catchtap>
+            <text class="action-icon">{{item.liked ? '❤️' : '🤍'}}</text>
+            <text class="action-count">{{item.likeCount || 0}}</text>
+          </view>
+          
+          <view class="action-item" bindtap="commentPost" data-post="{{item}}" catchtap>
+            <text class="action-icon">💬</text>
+            <text class="action-count">{{item.commentCount || 0}}</text>
+          </view>
+          
+          <view class="action-item" bindtap="sharePost" data-post="{{item}}" catchtap>
+            <text class="action-icon">↗️</text>
+          </view>
+        </view>
+
+        <!-- 最新评论预览 -->
+        <view class="comment-preview" wx:if="{{item.latestComment}}">
+          <text class="comment-author">{{item.latestComment.author}}:</text>
+          <text class="comment-content">{{item.latestComment.content}}</text>
+        </view>
+      </view>
+    </block>
+
+    <!-- 加载状态 -->
+    <view class="load-more" wx:if="{{isLoading}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+    
+    <view class="no-more" wx:if="{{!hasMore && posts.length > 0}}">
+      <text>— 没有更多内容了 —</text>
+    </view>
+  </scroll-view>
+
+  <!-- 发布按钮 -->
+  <view class="fab-button" bindtap="createPost">
+    <text class="fab-icon">+</text>
   </view>
 </view>

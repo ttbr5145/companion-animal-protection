@@ -1,20 +1,298 @@
-.container {
+/* 页面容器 */
+.dynamic-container {
     min-height: 100vh;
-    background: #f5f5f5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   }
   
+  /* 顶部选项卡美化 */
+  .tab-bar {
+    display: flex;
+    background: white;
+    padding: 0 30rpx;
+    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.08);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .tab-item {
+    flex: 1;
+    text-align: center;
+    padding: 30rpx 0;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  
+  .tab-text {
+    font-size: 30rpx;
+    color: #666;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .tab-item.active .tab-text {
+    color: #4CAF50;
+    font-weight: 600;
+  }
+  
+  .tab-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 4rpx;
+    background: #4CAF50;
+    border-radius: 2rpx;
+    transition: all 0.3s ease;
+  }
+  
+  .tab-item.active .tab-indicator {
+    width: 60rpx;
+  }
+  
+  /* 帖子卡片美化 */
+  .posts-list {
+    height: calc(100vh - 120rpx);
+    padding: 30rpx;
+  }
+  
+  .post-card {
+    background: white;
+    border-radius: 20rpx;
+    margin-bottom: 30rpx;
+    padding: 40rpx;
+    box-shadow: 0 4rpx 15rpx rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .post-card:active {
+    transform: translateY(2rpx);
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  }
+  
+  /* 帖子头部 */
+  .post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30rpx;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .user-avatar {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 50%;
+    border: 2rpx solid #f0f0f0;
+    margin-right: 20rpx;
+  }
+  
+  .user-meta {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .user-name {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8rpx;
+  }
+  
+  .post-time {
+    font-size: 22rpx;
+    color: #999;
+  }
+  
+  .post-type-badge {
+    padding: 8rpx 20rpx;
+    border-radius: 20rpx;
+    font-size: 22rpx;
+    font-weight: 500;
+  }
+  
+  .post-type-badge.support {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+  }
+  
+  .post-type-badge.report {
+    background: rgba(255, 107, 107, 0.1);
+    color: #FF6B6B;
+  }
+  
+  /* 状态标签 */
+  .status-badge {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8f9fa;
+    padding: 20rpx;
+    border-radius: 12rpx;
+    margin-bottom: 30rpx;
+  }
+  
+  .status-text {
+    font-size: 24rpx;
+    font-weight: 500;
+  }
+  
+  .status-text.pending {
+    color: #FFA500;
+  }
+  
+  .status-text.completed {
+    color: #4CAF50;
+  }
+  
+  .status-edit {
+    font-size: 24rpx;
+    color: #4CAF50;
+    padding: 8rpx 16rpx;
+    border: 1rpx solid #4CAF50;
+    border-radius: 8rpx;
+  }
+  
+  /* 帖子内容 */
+  .post-content {
+    margin-bottom: 30rpx;
+  }
+  
+  .post-title {
+    display: block;
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20rpx;
+    line-height: 1.4;
+  }
+  
+  .post-desc {
+    display: block;
+    font-size: 28rpx;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 30rpx;
+  }
+  
+  /* 图片展示 */
+  .post-images {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10rpx;
+    margin-bottom: 30rpx;
+  }
+  
+  .post-image {
+    width: 100%;
+    height: 200rpx;
+    border-radius: 12rpx;
+    background: #f5f5f5;
+  }
+  
+  .post-image.single-image {
+    height: 400rpx;
+    grid-column: span 3;
+  }
+  
+  /* 位置信息 */
+  .post-location {
+    display: flex;
+    align-items: center;
+    padding: 20rpx;
+    background: #f8f9fa;
+    border-radius: 12rpx;
+    margin-top: 20rpx;
+  }
+  
+  .location-icon {
+    margin-right: 15rpx;
+    font-size: 24rpx;
+  }
+  
+  .location-text {
+    font-size: 24rpx;
+    color: #666;
+  }
+  
+  /* 帖子操作栏 */
+  .post-actions {
+    display: flex;
+    border-top: 1rpx solid #f0f0f0;
+    padding-top: 30rpx;
+  }
+  
+  .action-item {
+    display: flex;
+    align-items: center;
+    margin-right: 40rpx;
+    padding: 15rpx 25rpx;
+    border-radius: 25rpx;
+    transition: all 0.3s ease;
+  }
+  
+  .action-item:active {
+    background: #f5f5f5;
+  }
+  
+  .action-item.liked {
+    color: #FF6B6B;
+  }
+  
+  .action-icon {
+    font-size: 32rpx;
+    margin-right: 10rpx;
+  }
+  
+  .action-count {
+    font-size: 24rpx;
+    color: #666;
+  }
+  
+  .action-item.liked .action-count {
+    color: #FF6B6B;
+    font-weight: 500;
+  }
+  
+  /* 最新评论预览 */
+  .comment-preview {
+    background: #f8f9fa;
+    padding: 20rpx;
+    border-radius: 12rpx;
+    margin-top: 20rpx;
+  }
+  
+  .comment-author {
+    font-size: 24rpx;
+    color: #4CAF50;
+    font-weight: 500;
+    margin-right: 10rpx;
+  }
+  
+  .comment-content {
+    font-size: 24rpx;
+    color: #666;
+    line-height: 1.4;
+  }
+  
+  /* 空状态 */
   .empty-state {
     text-align: center;
-    padding: 60rpx;
+    padding: 120rpx 60rpx;
   }
   
   .empty-icon {
     font-size: 120rpx;
     margin-bottom: 40rpx;
     display: block;
+    opacity: 0.5;
   }
   
   .empty-text {
@@ -22,10 +300,79 @@
     color: #333;
     display: block;
     margin-bottom: 20rpx;
+    font-weight: 500;
   }
   
   .empty-subtext {
     font-size: 28rpx;
     color: #666;
     display: block;
+    margin-bottom: 60rpx;
+  }
+  
+  .empty-btn {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    border: none;
+    border-radius: 50rpx;
+    padding: 0 60rpx;
+    height: 80rpx;
+    font-size: 28rpx;
+    font-weight: 500;
+  }
+  
+  /* 加载状态 */
+  .load-more, .no-more {
+    text-align: center;
+    padding: 40rpx;
+    color: #999;
+    font-size: 24rpx;
+  }
+  
+  .loading-spinner {
+    width: 40rpx;
+    height: 40rpx;
+    border: 4rpx solid #f3f3f3;
+    border-top: 4rpx solid #4CAF50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20rpx;
+  }
+  
+  .loading-text {
+    font-size: 24rpx;
+    color: #666;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* 发布按钮 */
+  .fab-button {
+    position: fixed;
+    right: 40rpx;
+    bottom: 120rpx;
+    width: 120rpx;
+    height: 120rpx;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8rpx 25rpx rgba(76, 175, 80, 0.4);
+    z-index: 100;
+    transition: all 0.3s ease;
+  }
+  
+  .fab-button:active {
+    transform: scale(0.95);
+    box-shadow: 0 4rpx 15rpx rgba(76, 175, 80, 0.6);
+  }
+  
+  .fab-icon {
+    color: white;
+    font-size: 50rpx;
+    font-weight: 200;
   }
