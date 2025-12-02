@@ -1,0 +1,22 @@
+<view class="container">
+  <view class="header">
+    <text class="title">法律之星API测试页面</text>
+  </view>
+  
+  <view class="test-section">
+    <button class="test-btn" bindtap="testConnection">测试API连接</button>
+    <button class="test-btn" bindtap="testSearch">测试搜索功能</button>
+    <button class="test-btn" bindtap="clearLog">清空日志</button>
+  </view>
+  
+  <view class="result-section">
+    <text class="section-title">测试结果：</text>
+    <scroll-view class="log-container" scroll-y>
+      <text class="log-text">{{testLog}}</text>
+    </scroll-view>
+  </view>
+  
+  <view class="loading" wx:if="{{isLoading}}">
+    <text>测试中...</text>
+  </view>
+</view>

@@ -1,8 +1,125 @@
 <view class="container">
-  <view class="page-header">
-    <text class="page-title">责任明晰板块</text>
-  </view>
-  <view class="content">
-    <text>责任明晰功能开发中...</text>
-  </view>
+    <!-- 页面标题 -->
+    <view class="page-header">
+        <text class="page-title">法律智能检索</text>
+        <text class="page-subtitle">基于法律之星数据库的专业检索平台</text>
+    </view>
+    
+    <!-- 搜索区域 -->
+    <view class="search-section">
+        <view class="search-box">
+            <view class="search-icon">🔍</view>
+            <input 
+                class="search-input"
+                placeholder="请输入法律问题，如：高空抛物、劳动合同解除..." 
+                value="{{query}}" 
+                bindinput="onInput"
+                bindconfirm="onSearch"
+                confirm-type="search"
+            />
+            <button class="search-btn" bindtap="onSearch" hover-class="btn-hover">搜索</button>
+        </view>
+        
+        <!-- 快捷搜索标签 -->
+        <view class="quick-search">
+            <text class="quick-title">常用搜索：</text>
+            <view class="tag-container">
+                <text class="tag" bindtap="quickSearch" data-query="伴侣动物保护法">伴侣动物保护法</text>
+                <text class="tag" bindtap="quickSearch" data-query="劳动合同解除">劳动合同解除</text>
+                <text class="tag" bindtap="quickSearch" data-query="高空抛物">高空抛物</text>
+                <text class="tag" bindtap="quickSearch" data-query="交通事故赔偿">交通事故赔偿</text>
+                <text class="tag" bindtap="quickSearch" data-query="民间借贷">民间借贷</text>
+                
+            </view>
+        </view>
+    </view>
+    
+    <!-- 加载状态 -->
+    <view wx:if="{{isLoading}}" class="loading-state">
+        <view class="loading-content">
+            <view class="loading-spinner"></view>
+            <text class="loading-text">AI正在检索相关法规...</text>
+            <text class="loading-tip">正在法律之星数据库中查找匹配内容</text>
+        </view>
+    </view>
+    
+    <!-- 搜索结果 -->
+    <view class="results-section" wx:if="{{!isLoading}}">
+        <!-- 结果统计 -->
+        <view class="results-header" wx:if="{{searchResults.length > 0}}">
+            <text class="results-count">找到 {{searchResults.length}} 条相关法规</text>
+            <text class="results-sort">按相关度排序</text>
+        </view>
+        
+        <!-- 结果列表 -->
+        <view class="results-list">
+            <block wx:for="{{searchResults}}" wx:key="lawId" wx:for-item="item" wx:for-index="index">
+                <view class="result-card" bindtap="onViewDetail" data-lawid="{{item.lawId}}">
+                    <!-- 顶部标题栏 -->
+                    <view class="card-header">
+                        <view class="law-title-section">
+                            <text class="law-title">{{item.lawName || '未知法规'}}</text>
+                            <view class="relevance-badge">{{item.scorePercent}}%</view>
+                        </view>
+                        <view class="law-meta">
+                            <text class="meta-item">{{item.issuingOrgan}}</text>
+                            <text class="meta-divider">•</text>
+                            <text class="meta-item {{item.timeliness === '现行有效' ? 'valid' : 'invalid'}}">
+                                {{item.timeliness}}
+                            </text>
+                        </view>
+                    </view>
+                    
+                    <!-- 内容预览 -->
+                    <view class="card-content">
+                        <text class="content-preview">{{item.content}}</text>
+                    </view>
+                    
+                    <!-- 底部信息 -->
+                    <view class="card-footer">
+                        <view class="footer-left">
+                            <text class="date-info">发布日期: {{item.releaseDate}}</text>
+                        </view>
+                        <view class="footer-right">
+                            <button class="detail-btn" bindtap="onViewDetail" data-lawid="{{item.lawId}}" catchtap="true">
+                                查看详情
+                            </button>
+                        </view>
+                    </view>
+                    
+                    <!-- 序号标识 -->
+                    <view class="card-index">{{index + 1}}</view>
+                </view>
+            </block>
+        </view>
+        
+        <!-- 空状态 -->
+        <view class="empty-state" wx:if="{{searchResults.length === 0 && hasSearched}}">
+            <view class="empty-icon">📄</view>
+            <text class="empty-title">未找到相关法规</text>
+            <text class="empty-tip">建议尝试其他关键词或更具体的法律问题</text>
+            <button class="empty-btn" bindtap="clearSearch">重新搜索</button>
+        </view>
+        
+        <!-- 初始状态提示 -->
+        <view class="welcome-state" wx:if="{{!hasSearched}}">
+            <view class="welcome-icon">⚖️</view>
+            <text class="welcome-title">欢迎使用法律智能检索</text>
+            <text class="welcome-tip">输入法律问题，AI将为您检索相关法规</text>
+            <view class="feature-list">
+                <view class="feature-item">
+                    <text class="feature-icon">🔍</text>
+                    <text class="feature-text">智能语义检索</text>
+                </view>
+                <view class="feature-item">
+                    <text class="feature-icon">📊</text>
+                    <text class="feature-text">权威法律数据库</text>
+                </view>
+                <view class="feature-item">
+                    <text class="feature-icon">⚡</text>
+                    <text class="feature-text">快速精准匹配</text>
+                </view>
+            </view>
+        </view>
+    </view>
 </view>

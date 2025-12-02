@@ -12,7 +12,9 @@
       "pages/about/about",
       "pages/updateProfile/updateProfile",
       "pages/postEdit/postEdit",
-      "pages/postDetail/postDetail"
+      "pages/postDetail/postDetail",
+      "pages/testLegal/testLegal",
+      "pages/lawDetail/lawDetail"
     ],
     "window": {
       "navigationBarTitleText": "伴侣动物保护平台",

@@ -1,3 +1,7 @@
 {
-  "usingComponents": {}
+    "navigationBarTitleText": "法律检索",
+    "enablePullDownRefresh": true,
+    "backgroundColor": "#667eea",
+    "backgroundTextStyle": "light",
+    "onReachBottomDistance": 50
 }

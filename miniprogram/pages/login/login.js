@@ -79,7 +79,7 @@ Page({
       });
     },
   
-    // 处理登录成功 - 确保这个函数在Page({})内部
+    // 处理登录成功 - 添加昵称判断逻辑
     handleLoginSuccess: function (result) {
         const app = getApp();
         
@@ -98,12 +98,36 @@ Page({
           duration: 1500,
           success: () => {
             setTimeout(() => {
-              // 跳转到功能页面（TabBar页面）
-              wx.switchTab({
-                url: '/pages/function/function'
-              });
+              // 判断用户是否设置了昵称
+              this.checkUserNickname(result.userInfo);
             }, 1500);
           }
         });
+    },
+  
+    // 检查用户昵称并决定跳转路径
+    checkUserNickname: function(userInfo) {
+      // 从用户信息中获取昵称，优先从根级别获取，如果没有则从userInfo对象获取
+      const nickName = userInfo.nickName || 
+                      (userInfo.userInfo && userInfo.userInfo.nickName) || 
+                      '';
+      
+      // 判断昵称是否为空或者是微信默认昵称
+      const isDefaultNickname = !nickName || 
+                              nickName === '微信用户' || 
+                              nickName === '微信用户' || 
+                              nickName.trim() === '';
+      
+      if (isDefaultNickname) {
+        // 未设置昵称，跳转到修改信息界面
+        wx.navigateTo({
+          url: '/pages/updateProfile/updateProfile'
+        });
+      } else {
+        // 已设置昵称，跳转到功能页面
+        wx.switchTab({
+          url: '/pages/function/function'
+        });
+      }
     }
   });
