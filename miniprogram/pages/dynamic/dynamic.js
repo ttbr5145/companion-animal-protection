@@ -1,3 +1,4 @@
+// dynamic/dynamic.js
 Page({
     data: {
       currentTab: 'all',
@@ -6,7 +7,30 @@ Page({
       hasMore: true,
       pageSize: 10,
       currentPage: 0,
-      userOpenid: ''
+      userOpenid: '',
+      // 细化举报帖子状态
+      reportStatuses: {
+        'pending_review': { name: '待审核', desc: '举报已提交，等待审核', color: '#FF9500' },
+        'under_review': { name: '审核中', desc: '相关部门正在核实情况', color: '#007AFF' },
+        'evidence_collection': { name: '取证中', desc: '正在收集相关证据', color: '#5856D6' },
+        'processing': { name: '处理中', desc: '问题正在处理解决', color: '#FF3B30' },
+        'resolved': { name: '已办结', desc: '举报事项已处理完成', color: '#4CAF50' }
+      },
+      // 支持服务帖子状态（保持不变）
+      supportStatuses: {
+        'pending': { name: '进行中', color: '#FFA500' },
+        'completed': { name: '已处理', color: '#4CAF50' }
+      }
+    },
+    getProgressWidth: function(reportStatus) {
+        const progressMap = {
+          'pending_review': 20,
+          'under_review': 40,
+          'evidence_collection': 60,
+          'processing': 80,
+          'resolved': 100
+        };
+        return progressMap[reportStatus] || 0;
     },
   
     onLoad: function (options) {
@@ -15,7 +39,6 @@ Page({
     },
   
     onShow: function () {
-      // 页面显示时刷新数据
       this.refreshPosts();
     },
   
@@ -25,7 +48,6 @@ Page({
       });
     },
   
-    // 获取用户openid
     getUserOpenid: function () {
       const app = getApp();
       if (app.globalData.openid) {
@@ -33,7 +55,6 @@ Page({
       }
     },
   
-    // 切换选项卡
     switchTab: function (e) {
       const tab = e.currentTarget.dataset.tab;
       if (this.data.currentTab !== tab) {
@@ -42,7 +63,6 @@ Page({
       }
     },
   
-    // 刷新帖子列表
     refreshPosts: function () {
       this.setData({
         currentPage: 0,
@@ -52,7 +72,6 @@ Page({
       return this.loadPosts();
     },
   
-    // 加载帖子列表
     loadPosts: function () {
       if (this.data.isLoading || !this.data.hasMore) return Promise.resolve();
   
@@ -62,7 +81,6 @@ Page({
       const _ = db.command;
       const { currentTab, currentPage, pageSize } = this.data;
   
-      // 构建查询条件
       let query = db.collection('posts').where({
         status: _.neq('deleted')
       });
@@ -80,7 +98,6 @@ Page({
           const newPosts = res.data;
           const hasMore = newPosts.length === pageSize;
   
-          // 处理帖子数据，添加交互状态
           const processedPosts = this.processPostsData(newPosts);
   
           this.setData({
@@ -103,34 +120,67 @@ Page({
         });
     },
   
-    // 处理帖子数据
+    // 修改：处理帖子数据，添加状态显示逻辑
     processPostsData: function (posts) {
       const app = getApp();
       const userOpenid = app.globalData.openid;
   
       return posts.map(post => {
-        // 检查用户是否点赞
         const liked = post.likes && post.likes.includes(userOpenid);
-        // 获取最新评论
         const latestComment = post.comments && post.comments.length > 0 ? 
           post.comments[post.comments.length - 1] : null;
+  
+        // 判断是否为发帖者
+        const isAuthor = post._openid === userOpenid;
+        
+        // 处理状态显示
+        let displayStatus = {};
+        if (post.postType === 'report') {
+          // 举报帖子：发帖者看到详细状态，非发帖者看到"未知"
+          if (isAuthor) {
+            const statusInfo = this.data.reportStatuses[post.reportStatus] || 
+                             this.data.reportStatuses.pending_review;
+            displayStatus = {
+              name: statusInfo.name,
+              desc: statusInfo.desc,
+              color: statusInfo.color,
+              visible: true
+            };
+          } else {
+            displayStatus = {
+              name: '未知',
+              desc: '举报进度仅发帖者可见',
+              color: '#999999',
+              visible: false
+            };
+          }
+        } else {
+          // 支持服务帖子：保持原有逻辑
+          const statusInfo = this.data.supportStatuses[post.status] || 
+                           this.data.supportStatuses.pending;
+          displayStatus = {
+            name: statusInfo.name,
+            color: statusInfo.color,
+            visible: true
+          };
+        }
   
         return {
           ...post,
           liked,
           likeCount: post.likes ? post.likes.length : 0,
           commentCount: post.comments ? post.comments.length : 0,
-          latestComment
+          latestComment,
+          displayStatus,
+          isAuthor
         };
       });
     },
   
-    // 滚动触底加载更多
     onReachBottom: function () {
       this.loadPosts();
     },
   
-    // 点赞/取消点赞
     likePost: function (e) {
       const post = e.currentTarget.dataset.post;
       const app = getApp();
@@ -146,7 +196,6 @@ Page({
           likes: operation
         }
       }).then(() => {
-        // 更新本地数据
         const posts = this.data.posts.map(p => {
           if (p._id === post._id) {
             const newLikes = isLiked ? 
@@ -173,7 +222,6 @@ Page({
       });
     },
   
-    // 查看帖子详情
     viewPostDetail: function (e) {
       const post = e.currentTarget.dataset.post;
       wx.navigateTo({
@@ -181,7 +229,6 @@ Page({
       });
     },
   
-    // 评论帖子
     commentPost: function (e) {
       const post = e.currentTarget.dataset.post;
       wx.navigateTo({
@@ -189,7 +236,6 @@ Page({
       });
     },
   
-    // 分享帖子
     sharePost: function (e) {
       const post = e.currentTarget.dataset.post;
       wx.showActionSheet({
@@ -204,41 +250,82 @@ Page({
       });
     },
   
-    // 改变帖子状态
+    // 修改：细化状态更改逻辑
     changeStatus: function (e) {
       const post = e.currentTarget.dataset.post;
-      const newStatus = post.status === 'completed' ? 'pending' : 'completed';
+      
+      if (post.postType === 'report') {
+        // 举报帖子：显示详细状态选项（仅发帖者可见）
+        if (!post.isAuthor) {
+          wx.showToast({
+            title: '无权限操作',
+            icon: 'none'
+          });
+          return;
+        }
+        
+        this.showReportStatusOptions(post);
+      } else {
+        // 支持服务帖子：保持原有逻辑
+        this.showSupportStatusOptions(post);
+      }
+    },
+  
+    // 新增：显示举报帖子状态选项
+    showReportStatusOptions: function (post) {
+      const statusOptions = [
+        '待审核', '审核中', '取证中', '处理中', '已办结'
+      ];
       
       wx.showActionSheet({
-        itemList: ['标记为进行中', '标记为已处理', '取消'],
+        itemList: statusOptions,
         success: (res) => {
-          if (res.tapIndex === 0) {
-            this.updatePostStatus(post, 'pending');
-          } else if (res.tapIndex === 1) {
-            this.updatePostStatus(post, 'completed');
+          const statusMap = {
+            0: 'pending_review',
+            1: 'under_review',
+            2: 'evidence_collection',
+            3: 'processing',
+            4: 'resolved'
+          };
+          
+          const newStatus = statusMap[res.tapIndex];
+          if (newStatus) {
+            this.updatePostStatus(post, newStatus, 'reportStatus');
           }
         }
       });
     },
   
-    // 更新帖子状态
-    updatePostStatus: function (post, status) {
+    // 修改：支持服务帖子状态选项
+    showSupportStatusOptions: function (post) {
+      wx.showActionSheet({
+        itemList: ['标记为进行中', '标记为已处理', '取消'],
+        success: (res) => {
+          if (res.tapIndex === 0) {
+            this.updatePostStatus(post, 'pending', 'status');
+          } else if (res.tapIndex === 1) {
+            this.updatePostStatus(post, 'completed', 'status');
+          }
+        }
+      });
+    },
+  
+    // 修改：更新帖子状态
+    updatePostStatus: function (post, status, statusField = 'status') {
       const db = wx.cloud.database();
       
+      const updateData = {};
+      updateData[statusField] = status;
+      updateData.updatedAt = new Date();
+  
       db.collection('posts').doc(post._id).update({
-        data: { status }
+        data: updateData
       }).then(() => {
-        const posts = this.data.posts.map(p => {
-          if (p._id === post._id) {
-            return { ...p, status };
-          }
-          return p;
-        });
-        
-        this.setData({ posts });
+        // 刷新当前页面数据
+        this.refreshPosts();
         
         wx.showToast({
-          title: status === 'completed' ? '已标记为已处理' : '已标记为进行中',
+          title: '状态更新成功',
           icon: 'success'
         });
       }).catch(err => {
@@ -250,7 +337,6 @@ Page({
       });
     },
   
-    // 预览图片
     previewImage: function (e) {
       const images = e.currentTarget.dataset.images;
       const index = e.currentTarget.dataset.index;
@@ -261,26 +347,24 @@ Page({
       });
     },
   
-    // 创建新帖子
     createPost: function () {
       wx.navigateTo({
         url: '/pages/postEdit/postEdit'
       });
     },
   
-    // 时间格式化
     formatTime: function (timestamp) {
       const date = new Date(timestamp);
       const now = new Date();
       const diff = now - date;
       
-      if (diff < 60000) { // 1分钟内
+      if (diff < 60000) {
         return '刚刚';
-      } else if (diff < 3600000) { // 1小时内
+      } else if (diff < 3600000) {
         return Math.floor(diff / 60000) + '分钟前';
-      } else if (diff < 86400000) { // 1天内
+      } else if (diff < 86400000) {
         return Math.floor(diff / 3600000) + '小时前';
-      } else if (diff < 604800000) { // 1周内
+      } else if (diff < 604800000) {
         return Math.floor(diff / 86400000) + '天前';
       } else {
         return date.getMonth() + 1 + '月' + date.getDate() + '日';

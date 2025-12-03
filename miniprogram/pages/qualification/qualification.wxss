@@ -1,22 +1,362 @@
+/* pages/qualification/qualification.wxss */
 .container {
-    padding: 40rpx;
     min-height: 100vh;
-    background: #f5f5f5;
+    background-color: #f5f5f5;
+    padding: 20rpx;
   }
   
-  .page-header {
+  /* 步骤1样式 */
+  .step-section {
+    padding: 20rpx;
+  }
+  
+  .step-header {
     text-align: center;
-    margin-bottom: 60rpx;
+    margin-bottom: 40rpx;
   }
   
-  .page-title {
-    font-size: 40rpx;
+  .step-title {
+    display: block;
+    font-size: 36rpx;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10rpx;
+  }
+  
+  .step-desc {
+    font-size: 28rpx;
+    color: #666;
+  }
+  
+  .upload-list {
+    margin-bottom: 40rpx;
+  }
+  
+  .upload-item {
+    background: white;
+    border-radius: 16rpx;
+    padding: 30rpx;
+    margin-bottom: 20rpx;
+    box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.05);
+  }
+  
+  .item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20rpx;
+  }
+  
+  .item-title {
+    font-size: 32rpx;
     font-weight: bold;
     color: #333;
   }
   
-  .content {
+  .item-status {
+    font-size: 26rpx;
+    color: #07c160;
+  }
+  
+  .upload-area {
+    height: 200rpx;
+    border: 2rpx dashed #ddd;
+    border-radius: 12rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  
+  .upload-area.has-image {
+    border-color: #07c160;
+  }
+  
+  .upload-placeholder {
     text-align: center;
+  }
+  
+  .placeholder-icon {
+    display: block;
+    font-size: 48rpx;
+    color: #ccc;
+    margin-bottom: 10rpx;
+  }
+  
+  .placeholder-text {
+    font-size: 26rpx;
+    color: #999;
+  }
+  
+  .upload-area image {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .submit-section {
+    text-align: center;
+  }
+  
+  .submit-btn {
+    background-color: #07c160;
+    color: white;
+    border: none;
+    border-radius: 50rpx;
+    padding: 24rpx 60rpx;
     font-size: 32rpx;
+    margin-bottom: 20rpx;
+  }
+  
+  .submit-btn[disabled] {
+    background-color: #ccc;
+    color: #999;
+  }
+  
+  .submit-tip {
+    font-size: 26rpx;
+    color: #999;
+  }
+  
+  /* 步骤2样式 */
+  .progress-section {
+    padding: 60rpx 40rpx;
+    text-align: center;
+  }
+  
+  .progress-header {
+    margin-bottom: 60rpx;
+  }
+  
+  .progress-title {
+    display: block;
+    font-size: 36rpx;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10rpx;
+  }
+  
+  .progress-desc {
+    font-size: 28rpx;
     color: #666;
+  }
+  
+  .progress-container {
+    margin-bottom: 40rpx;
+  }
+  
+  .progress-bar {
+    width: 100%;
+    height: 16rpx;
+    background-color: #e0e0e0;
+    border-radius: 8rpx;
+    margin-bottom: 20rpx;
+    overflow: hidden;
+  }
+  
+  .progress-inner {
+    height: 100%;
+    background: linear-gradient(90deg, #07c160, #09f176);
+    border-radius: 8rpx;
+    transition: width 0.3s ease;
+  }
+  
+  .progress-text {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #07c160;
+  }
+  
+  .task-display {
+    margin: 40rpx 0;
+  }
+  
+  .current-task {
+    font-size: 28rpx;
+    color: #666;
+    background: white;
+    padding: 20rpx 30rpx;
+    border-radius: 12rpx;
+    display: inline-block;
+  }
+  
+  .progress-tip {
+    margin-top: 40rpx;
+  }
+  
+  .progress-tip text {
+    font-size: 24rpx;
+    color: #999;
+  }
+  
+  /* 步骤3样式 */
+  .result-section {
+    padding: 20rpx;
+  }
+  
+  .result-header {
+    background: white;
+    border-radius: 16rpx;
+    padding: 40rpx 30rpx;
+    text-align: center;
+    margin-bottom: 30rpx;
+    box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.08);
+  }
+  
+  .result-header.passed {
+    border-left: 8rpx solid #07c160;
+  }
+  
+  .result-header.failed {
+    border-left: 8rpx solid #fa5151;
+  }
+  
+  .result-icon {
+    display: block;
+    font-size: 80rpx;
+    margin-bottom: 20rpx;
+  }
+  
+  .result-header.passed .result-icon {
+    color: #07c160;
+  }
+  
+  .result-header.failed .result-icon {
+    color: #fa5151;
+  }
+  
+  .result-title {
+    display: block;
+    font-size: 36rpx;
+    font-weight: bold;
+    margin-bottom: 15rpx;
+  }
+  
+  .result-summary {
+    font-size: 28rpx;
+    color: #666;
+    line-height: 1.5;
+  }
+  
+  .detail-section {
+    background: white;
+    border-radius: 16rpx;
+    padding: 30rpx;
+    margin-bottom: 30rpx;
+  }
+  
+  .detail-title {
+    font-size: 32rpx;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 25rpx;
+    display: block;
+  }
+  
+  .detail-item {
+    padding: 25rpx;
+    border-radius: 12rpx;
+    margin-bottom: 20rpx;
+    border-left: 6rpx solid;
+  }
+  
+  .detail-item.passed {
+    border-left-color: #07c160;
+    background-color: #f0f9f4;
+  }
+  
+  .detail-item.failed {
+    border-left-color: #fa5151;
+    background-color: #fef0f0;
+  }
+  
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15rpx;
+  }
+  
+  .detail-type {
+    font-size: 28rpx;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .detail-status {
+    font-size: 26rpx;
+    font-weight: bold;
+    padding: 6rpx 16rpx;
+    border-radius: 20rpx;
+  }
+  
+  .detail-item.passed .detail-status {
+    color: #07c160;
+    background-color: #e8f7ef;
+  }
+  
+  .detail-item.failed .detail-status {
+    color: #fa5151;
+    background-color: #fde8e8;
+  }
+  
+  .detail-content {
+    font-size: 26rpx;
+  }
+  
+  .detail-reason {
+    display: block;
+    color: #666;
+    margin-bottom: 10rpx;
+    line-height: 1.4;
+  }
+  
+  .detail-suggestion {
+    display: block;
+    color: #999;
+    font-size: 24rpx;
+    line-height: 1.4;
+  }
+  
+  .suggestion-section {
+    background: white;
+    border-radius: 16rpx;
+    padding: 30rpx;
+    margin-bottom: 40rpx;
+  }
+  
+  .suggestion-title {
+    font-size: 28rpx;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15rpx;
+    display: block;
+  }
+  
+  .suggestion-content {
+    font-size: 26rpx;
+    color: #666;
+    line-height: 1.5;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 20rpx;
+  }
+  
+  .restart-btn, .save-btn {
+    flex: 1;
+    border: none;
+    border-radius: 50rpx;
+    padding: 24rpx;
+    font-size: 30rpx;
+  }
+  
+  .restart-btn {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+  
+  .save-btn {
+    background-color: #07c160;
+    color: white;
   }

@@ -1,3 +1,4 @@
+// cloudfunctions/legalSearch/index.js
 const cloud = require('wx-server-sdk');
 const rp = require('request-promise');
 const config = require('./config.json');

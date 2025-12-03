@@ -1,5 +1,6 @@
+<!-- dynamic/dynamic.wxml -->
 <view class="dynamic-container">
-  <!-- 顶部选项卡 - 美化版 -->
+  <!-- 顶部选项卡 -->
   <view class="tab-bar">
     <view class="tab-item {{currentTab === 'all' ? 'active' : ''}}" 
           bindtap="switchTab" data-tab="all">
@@ -45,12 +46,41 @@
           </view>
         </view>
 
-        <!-- 状态标签（帖主可见） -->
-        <view class="status-badge" wx:if="{{item._openid === userOpenid}}">
-          <text class="status-text {{item.status === 'completed' ? 'completed' : 'pending'}}">
-            {{item.status === 'completed' ? '✅ 已处理' : '🕒 进行中'}}
-          </text>
-          <text class="status-edit" bindtap="changeStatus" data-post="{{item}}" catchtap>更改</text>
+        <!-- 状态标签 - 美化版 -->
+        <view class="status-section">
+          <view class="status-badge" style="border-left-color: {{item.displayStatus.color}};">
+            <view class="status-content">
+              <view class="status-header">
+                <text class="status-icon">📊</text>
+                <text class="status-title" style="color: {{item.displayStatus.color}};">
+                  {{item.displayStatus.name}}
+                </text>
+                <text class="status-edit" 
+                      wx:if="{{item.isAuthor}}" 
+                      bindtap="changeStatus" 
+                      data-post="{{item}}" 
+                      catchtap>
+                  更改状态
+                </text>
+              </view>
+              <text class="status-desc" wx:if="{{item.displayStatus.desc}}">
+                {{item.displayStatus.desc}}
+              </text>
+              <!-- 进度条（仅举报帖子且发帖者可见） -->
+              <view class="progress-bar" wx:if="{{item.postType === 'report' && item.isAuthor}}">
+                <view class="progress-track">
+                  <view class="progress-fill" style="width: {{getProgressWidth(item.reportStatus)}}%; background: {{item.displayStatus.color}};"></view>
+                </view>
+                <view class="progress-labels">
+                  <text class="progress-label {{item.reportStatus === 'pending_review' ? 'active' : ''}}">提交</text>
+                  <text class="progress-label {{item.reportStatus === 'under_review' ? 'active' : ''}}">审核</text>
+                  <text class="progress-label {{item.reportStatus === 'evidence_collection' ? 'active' : ''}}">取证</text>
+                  <text class="progress-label {{item.reportStatus === 'processing' ? 'active' : ''}}">处理</text>
+                  <text class="progress-label {{item.reportStatus === 'resolved' ? 'active' : ''}}">完成</text>
+                </view>
+              </view>
+            </view>
+          </view>
         </view>
 
         <!-- 帖子内容 -->
@@ -89,13 +119,19 @@
           
           <view class="action-item" bindtap="sharePost" data-post="{{item}}" catchtap>
             <text class="action-icon">↗️</text>
+            <text class="action-text">分享</text>
           </view>
         </view>
 
         <!-- 最新评论预览 -->
         <view class="comment-preview" wx:if="{{item.latestComment}}">
-          <text class="comment-author">{{item.latestComment.author}}:</text>
-          <text class="comment-content">{{item.latestComment.content}}</text>
+          <view class="comment-header">
+            <text class="comment-label">最新评论</text>
+          </view>
+          <view class="comment-content">
+            <text class="comment-author">{{item.latestComment.author}}:</text>
+            <text class="comment-text">{{item.latestComment.content}}</text>
+          </view>
         </view>
       </view>
     </block>

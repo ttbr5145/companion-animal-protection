@@ -1,3 +1,4 @@
+<!-- function/function.wxml -->
 <view class="container">
   <!-- 顶部用户信息卡片 -->
   <view class="user-card">
@@ -37,10 +38,10 @@
         <text class="card-desc">查询相关资质信息</text>
       </view>
 
-      <!-- 支持服务板块 -->
+      <!-- 寻求支持板块 -->
       <view class="function-card" bindtap="navigateToPage" data-page="support">
         <view class="card-icon support">💝</view>
-        <text class="card-title">支持服务</text>
+        <text class="card-title">寻求支持</text>
         <text class="card-desc">获取帮助与支持</text>
       </view>
 

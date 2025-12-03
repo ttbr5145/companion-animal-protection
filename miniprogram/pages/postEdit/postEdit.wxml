@@ -1,3 +1,4 @@
+<!-- postEdit/postEdit.wxml -->
 <view class="container">
   <!-- 顶部类型提示 -->
   <view class="type-indicator {{postType}}">

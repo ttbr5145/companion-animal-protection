@@ -1,3 +1,4 @@
+// function/function.js
 Page({
     data: {
       userInfo: null
@@ -31,53 +32,64 @@ Page({
       }
     },
   
-    // 跳转到功能页面 - 已修复
+    // 跳转到功能页面 - 修改report跳转逻辑
     navigateToPage: function (e) {
-      const page = e.currentTarget.dataset.page; // 正确获取页面类型
-      
-      // 添加点击反馈
-      wx.vibrateShort({ type: 'light' });
-      
-      // 对 support 和 report 进行特殊处理，跳转到统一的发帖页面
-      if (page === 'support' || page === 'report') {
+        const page = e.currentTarget.dataset.page;
+        
+        // 添加点击反馈
+        wx.vibrateShort({ type: 'light' });
+        
+        if (page === 'support') {
         wx.navigateTo({
-          url: `/pages/postEdit/postEdit?type=${page}`, // 携带类型参数
-          fail: (err) => {
+            url: `/pages/postEdit/postEdit?type=${page}`,
+            fail: (err) => {
             console.error('跳转到发帖页失败:', err);
             wx.showToast({
-              title: '页面不存在或未注册',
-              icon: 'none',
-              duration: 2000
+                title: '页面不存在或未注册',
+                icon: 'none',
+                duration: 2000
             });
-          }
+            }
         });
-      } else {
-        // 其他功能（如responsibility, qualification）保持原有跳转逻辑
+        } else if (page === 'report') {
+        // 跳转到工单创建页面，传递类型参数
+        wx.navigateTo({
+            url: '/pages/ticket-list/ticket-list',
+            fail: (err) => {
+            console.error('跳转到工单创建页失败:', err);
+            wx.showToast({
+                title: '页面不存在或未注册',
+                icon: 'none',
+                duration: 2000
+            });
+            }
+        });
+        } else {
         const pageMap = {
-          'responsibility': '/pages/responsibility/responsibility',
-          'qualification': '/pages/qualification/qualification'
+            'responsibility': '/pages/responsibility/responsibility',
+            'qualification': '/pages/qualification/qualification'
         };
         
         if (pageMap[page]) {
-          wx.navigateTo({
+            wx.navigateTo({
             url: pageMap[page],
             fail: (err) => {
-              console.error('页面跳转失败:', err);
-              wx.showToast({
+                console.error('页面跳转失败:', err);
+                wx.showToast({
                 title: '功能暂未开放',
                 icon: 'none',
                 duration: 2000
-              });
+                });
             }
-          });
+            });
         } else {
-          wx.showToast({
+            wx.showToast({
             title: '功能不存在',
             icon: 'none',
             duration: 2000
-          });
+            });
         }
-      }
+        }
     },
   
     // 下拉刷新

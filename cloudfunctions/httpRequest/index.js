@@ -1,48 +1,29 @@
-const cloud = require('wx-server-sdk');
-const rp = require('request-promise');
+// cloudfunctions/httpRequest/index.js
+const cloud = require('wx-server-sdk')
+cloud.init()
 
-cloud.init();
-
-/**
- * 通用的HTTP请求云函数
- * 用于支持其他云函数发起HTTP请求
- */
 exports.main = async (event) => {
-  const {
-    url,
-    method = 'GET',
-    headers = {},
-    data = {},
-    timeout = 10000
-  } = event;
+  const { url, method = 'GET', headers = {}, data = null } = event
   
   try {
-    const options = {
-      method: method,
-      uri: url,
-      headers: headers,
-      json: true,
-      timeout: timeout
-    };
+    const result = await cloud.callFunction({
+      name: 'httpRequest',
+      data: {
+        url,
+        method,
+        headers,
+        data
+      }
+    })
     
-    // 根据请求方法设置数据
-    if (method.toUpperCase() === 'POST' || method.toUpperCase() === 'PUT') {
-      options.body = data;
-    } else {
-      options.qs = data;
-    }
-    
-    const result = await rp(options);
     return {
       success: true,
-      data: result
-    };
+      data: result.result
+    }
   } catch (error) {
-    console.error('HTTP请求失败:', error);
     return {
       success: false,
-      error: error.message,
-      error_code: 'HTTP_REQUEST_FAILED'
-    };
+      error: error.message
+    }
   }
-};
+}

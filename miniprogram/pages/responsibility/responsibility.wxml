@@ -29,7 +29,10 @@
                 <text class="tag" bindtap="quickSearch" data-query="高空抛物">高空抛物</text>
                 <text class="tag" bindtap="quickSearch" data-query="交通事故赔偿">交通事故赔偿</text>
                 <text class="tag" bindtap="quickSearch" data-query="民间借贷">民间借贷</text>
-                
+                <text class="tag" bindtap="quickSearch" data-query="我想结婚了">我想结婚了</text>
+                <text class="tag" bindtap="quickSearch" data-query="我对象出轨了但是还没结婚">我对象出轨了但是还没结婚</text>
+                <text class="tag" bindtap="quickSearch" data-query="我朋友出轨被捉但是没结婚">我朋友出轨被捉但是没结婚</text>
+                <text class="tag" bindtap="quickSearch" data-query="我在公海赌博可以把钱带回家吗">我在公海赌博可以把钱带回家吗</text>
             </view>
         </view>
     </view>

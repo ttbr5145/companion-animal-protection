@@ -1,0 +1,9 @@
+{
+    "usingComponents": {},
+    "navigationBarTitleText": "工单详情",
+    "navigationBarTextStyle": "black",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f8f9fa",
+    "enablePullDownRefresh": false,
+    "disableScroll": false
+  }

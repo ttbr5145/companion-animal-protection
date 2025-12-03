@@ -1,12 +1,13 @@
+<!-- profile/profile.wxml -->
 <view class="container">
   <!-- 顶部用户信息区域 - 黄色背景 -->
   <view class="user-header">
     <view class="user-info-section">
-      <image class="user-avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}"></image>
-      <view class="user-details">
+        <image class="user-avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}"></image>
+        <view class="user-details">
         <text class="user-nickname">{{userInfo.nickName || '微信用户'}}</text>
-        <text class="user-level">动物保护志愿者</text>
-      </view>
+        <text class="user-level">👤 普通用户</text>
+    </view>
       <!-- 修改打卡按钮，根据状态动态变化 -->
       <button class="checkin-btn {{checkinButtonDisabled ? 'checkin-btn-disabled' : ''}}" 
               bindtap="handleCheckin"
@@ -32,17 +33,17 @@
     </view>
   </view>
 
-  <!-- 注册志愿者横幅 -->
-  <view class="volunteer-banner" bindtap="registerAsVolunteer">
+    <!-- 修改志愿者注册横幅，固定显示 -->
+    <view class="volunteer-banner" bindtap="showDevelopmentPrompt">
     <view class="volunteer-content">
-      <text class="volunteer-title">注册为伴侣动物保护志愿者</text>
-      <text class="volunteer-desc">加入我们，共同保护伴侣动物</text>
+        <text class="volunteer-title">注册为伴侣动物保护志愿者</text>
+        <text class="volunteer-desc">加入我们，共同保护伴侣动物</text>
     </view>
     <view class="volunteer-action">
-      <text class="volunteer-action-text">立即注册</text>
-      <view class="arrow">›</view>
+        <text class="volunteer-action-text">立即注册</text>
+        <view class="arrow">›</view>
     </view>
-  </view>
+    </view>
 
   <!-- 图标导航网格 -->
   <view class="icon-grid">
@@ -97,6 +98,20 @@
       <view class="list-item full-width" bindtap="bindPhone">
         <view class="item-icon">📱</view>
         <text class="item-text">绑定手机号</text>
+        <view class="item-arrow">›</view>
+      </view>
+    </view>
+    
+    <!-- 修改我的工单和我的帖子部分 -->
+    <view class="list-section">
+      <view class="list-item full-width" bindtap="showDevelopmentPrompt">
+        <view class="item-icon">🎫</view>
+        <text class="item-text">我的工单</text>
+        <view class="item-arrow">›</view>
+      </view>
+      <view class="list-item full-width" bindtap="navigateToMyPosts">
+        <view class="item-icon">📝</view>
+        <text class="item-text">我的帖子</text>
         <view class="item-arrow">›</view>
       </view>
     </view>

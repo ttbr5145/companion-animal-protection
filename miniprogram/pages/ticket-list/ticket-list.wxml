@@ -1,0 +1,68 @@
+<!-- ticket-list/ticket-list.wxml -->
+<view class="container">
+  <!-- 顶部操作栏 -->
+  <view class="header">
+    <view class="submit-btn" bindtap="toSubmit">
+      <text class="icon">+</text>
+      <text>提交工单</text>
+    </view>
+    
+    <!-- 筛选条件 -->
+    <view class="filters">
+      <picker range="{{statusOptions}}" value="{{statusIndex}}" bindchange="statusChange">
+        <view class="filter-item {{statusIndex > 0 ? 'active' : ''}}">
+          {{statusOptions[statusIndex]}}
+        </view>
+      </picker>
+      
+      <picker range="{{typeOptions}}" value="{{typeIndex}}" bindchange="typeChange">
+        <view class="filter-item {{typeIndex > 0 ? 'active' : ''}}">
+          {{typeOptions[typeIndex]}}
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- 工单列表 -->
+  <view class="ticket-list">
+    <view wx:for="{{tickets}}" wx:key="_id" class="ticket-item" bindtap="viewDetail" data-id="{{item._id}}">
+      <view class="ticket-header">
+        <view class="left">
+          <text class="type">{{item.type}}</text>
+          <text class="submitter">{{item.submitterInfo.nickName}}</text>
+        </view>
+        <text class="status {{item.status}}">{{statusText[item.status]}}</text>
+      </view>
+      
+      <view class="ticket-content">
+        <text class="title">{{item.title || '无标题'}}</text>
+        <text class="description">{{item.description}}</text>
+      </view>
+      
+      <view class="ticket-footer">
+        <text class="time">{{formatTime(item.submitTime)}}</text>
+        <view class="meta">
+          <text wx:if="{{item.images && item.images.length > 0}}" class="meta-item">📷 {{item.images.length}}</text>
+          <text wx:if="{{item.location}}" class="meta-item">📍</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 空状态 -->
+    <view wx:if="{{tickets.length === 0 && !loading}}" class="empty">
+      <image src="/images/empty-ticket.png" class="empty-image"></image>
+      <text class="empty-text">暂无工单</text>
+      <text class="empty-desc">点击上方按钮提交第一个工单</text>
+    </view>
+    
+    <!-- 加载状态 -->
+    <view wx:if="{{loading}}" class="loading">
+      <text>加载中...</text>
+    </view>
+  </view>
+
+  <!-- 加载更多 -->
+  <view wx:if="{{hasMore && !loading}}" class="load-more">
+    <text bindtap="loadMore">加载更多</text>
+  </view>
+</view>

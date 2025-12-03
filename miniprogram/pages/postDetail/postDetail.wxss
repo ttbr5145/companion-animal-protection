@@ -1,3 +1,4 @@
+/* postDetail/postDetail.wxss */
 /* 页面容器 */
 .post-detail-container {
     height: 100vh;

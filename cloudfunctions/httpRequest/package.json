@@ -1,16 +1,9 @@
 {
-    "name": "http-request",
+    "name": "httpRequest",
     "version": "1.0.0",
-    "description": "HTTP请求工具函数",
+    "description": "HTTP请求云函数",
     "main": "index.js",
-    "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
-    },
     "dependencies": {
-      "wx-server-sdk": "latest",
-      "request": "^2.88.2",
-      "request-promise": "^4.2.6"
-    },
-    "author": "",
-    "license": "ISC"
+      "wx-server-sdk": "~2.6.3"
+    }
   }

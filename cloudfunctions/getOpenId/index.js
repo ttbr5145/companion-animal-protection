@@ -1,3 +1,4 @@
+// cloudfunctions/getOpenId/index.js
 // 云函数入口文件
 const cloud = require('cloud1-5g88rmqa7bde7156')
 

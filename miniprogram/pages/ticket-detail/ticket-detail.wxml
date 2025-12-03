@@ -1,0 +1,71 @@
+<!-- pages/ticket-detail/ticket-detail.wxml -->
+<view class="container">
+  <!-- 基本信息区域 -->
+  <view class="section">
+    <view class="section-title">基本信息</view>
+    <view class="info-item">
+      <text class="label">工单标题：</text>
+      <text class="value">{{ticket.title}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">提交者：</text>
+      <text class="value">{{ticket.submitterInfo.nickName}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">工单类型：</text>
+      <text class="value">{{typeText[ticket.type]}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">提交时间：</text>
+      <text class="value">{{ticket.submitTime}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">当前状态：</text>
+      <text class="status {{ticket.status}}">{{statusText[ticket.status]}}</text>
+    </view>
+  </view>
+
+  <!-- 问题描述区域 -->
+  <view class="section" wx:if="{{ticket.description}}">
+    <view class="section-title">问题描述</view>
+    <view class="description">{{ticket.description}}</view>
+  </view>
+
+  <!-- 现场图片区域 -->
+  <view class="section" wx:if="{{ticket.images && ticket.images.length}}">
+    <view class="section-title">现场图片</view>
+    <view class="images">
+      <block wx:for="{{ticket.images}}" wx:key="*this">
+        <image 
+          src="{{item}}" 
+          mode="aspectFill" 
+          data-url="{{item}}" 
+          bindtap="previewImage"
+          class="image-item"
+        ></image>
+      </block>
+    </view>
+  </view>
+
+  <!-- 位置信息区域 -->
+  <view class="section" wx:if="{{ticket.location}}">
+    <view class="section-title">位置信息</view>
+    <view class="location">
+      {{ticket.location.address}}
+      <view class="coordinates" wx:if="{{ticket.location.latitude}}">
+        坐标：{{ticket.location.latitude}}, {{ticket.location.longitude}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 管理员回复区域 -->
+  <view class="section" wx:if="{{ticket.adminReply}}">
+    <view class="section-title">管理员回复</view>
+    <view class="admin-reply">{{ticket.adminReply}}</view>
+  </view>
+
+  <!-- 操作按钮区域 -->
+  <view class="actions" wx:if="{{ticket.status === 'pending' || ticket.status === 'processing'}}">
+    <button class="btn cancel-btn" bindtap="cancelTicket">取消工单</button>
+  </view>
+</view>

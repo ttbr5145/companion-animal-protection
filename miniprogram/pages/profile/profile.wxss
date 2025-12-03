@@ -1,3 +1,4 @@
+/* profile/profile.wxss */
 /* 页面容器 */
 .container {
     min-height: 100vh;
@@ -75,6 +76,18 @@
 .checkin-btn:active {
     background: rgba(255, 255, 255, 1);
     transform: scale(0.95);
+}
+
+.checkin-btn-disabled {
+    background: rgba(255, 255, 255, 0.6) !important;
+    color: #ccc !important;
+    opacity: 0.7;
+}
+
+.checkin-btn:disabled {
+    background: rgba(255, 255, 255, 0.6) !important;
+    color: #ccc !important;
+    opacity: 0.7;
 }
 
 /* 数据统计区域 */
@@ -414,36 +427,6 @@
 }
 
 /* 打卡成功提示 */
-.checkin-toast {
-    position: fixed;
-    top: 200rpx;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 20rpx 40rpx;
-    border-radius: 40rpx;
-    z-index: 1000;
-}
-
-.checkin-text {
-    font-size: 28rpx;
-}
-
-/* 打卡按钮禁用状态 */
-.checkin-btn-disabled {
-    background: rgba(255, 255, 255, 0.6) !important;
-    color: #ccc !important;
-    opacity: 0.7;
-}
-
-.checkin-btn:disabled {
-    background: rgba(255, 255, 255, 0.6) !important;
-    color: #ccc !important;
-    opacity: 0.7;
-}
-
-/* 打卡成功提示优化 */
 .checkin-toast {
     position: fixed;
     top: 50%;

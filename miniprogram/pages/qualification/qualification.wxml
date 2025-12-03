@@ -1,8 +1,173 @@
+<!-- pages/qualification/qualification.wxml -->
 <view class="container">
-  <view class="page-header">
-    <text class="page-title">资质查询板块</text>
+  <!-- 步骤1: 材料上传 -->
+  <view class="step-section" wx:if="{{currentStep === 1}}">
+    <view class="step-header">
+      <text class="step-title">材料上传</text>
+      <text class="step-desc">请上传以下5项必需材料</text>
+    </view>
+    
+    <view class="upload-list">
+      <view class="upload-item" bindtap="chooseIdentityCard">
+        <view class="item-header">
+          <text class="item-title">身份证明</text>
+          <text class="item-status {{identityCard ? 'uploaded' : ''}}">
+            {{identityCard ? '✓ 已上传' : '未上传'}}
+          </text>
+        </view>
+        <view class="upload-area {{identityCard ? 'has-image' : ''}}">
+          <image wx:if="{{identityCard}}" src="{{identityCard}}" mode="aspectFill"></image>
+          <view wx:else class="upload-placeholder">
+            <text class="placeholder-icon">+</text>
+            <text class="placeholder-text">点击上传身份证</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="upload-item" bindtap="chooseResidenceProof">
+        <view class="item-header">
+          <text class="item-title">居住证明</text>
+          <text class="item-status {{residenceProof ? 'uploaded' : ''}}">
+            {{residenceProof ? '✓ 已上传' : '未上传'}}
+          </text>
+        </view>
+        <view class="upload-area {{residenceProof ? 'has-image' : ''}}">
+          <image wx:if="{{residenceProof}}" src="{{residenceProof}}" mode="aspectFill"></image>
+          <view wx:else class="upload-placeholder">
+            <text class="placeholder-icon">+</text>
+            <text class="placeholder-text">点击上传居住证明</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="upload-item" bindtap="choosePetSourceProof">
+        <view class="item-header">
+          <text class="item-title">宠物来源证明</text>
+          <text class="item-status {{petSourceProof ? 'uploaded' : ''}}">
+            {{petSourceProof ? '✓ 已上传' : '未上传'}}
+          </text>
+        </view>
+        <view class="upload-area {{petSourceProof ? 'has-image' : ''}}">
+          <image wx:if="{{petSourceProof}}" src="{{petSourceProof}}" mode="aspectFill"></image>
+          <view wx:else class="upload-placeholder">
+            <text class="placeholder-icon">+</text>
+            <text class="placeholder-text">点击上传来源证明</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="upload-item" bindtap="chooseHealthProof">
+        <view class="item-header">
+          <text class="item-title">健康证明</text>
+          <text class="item-status {{healthProof ? 'uploaded' : ''}}">
+            {{healthProof ? '✓ 已上传' : '未上传'}}
+          </text>
+        </view>
+        <view class="upload-area {{healthProof ? 'has-image' : ''}}">
+          <image wx:if="{{healthProof}}" src="{{healthProof}}" mode="aspectFill"></image>
+          <view wx:else class="upload-placeholder">
+            <text class="placeholder-icon">+</text>
+            <text class="placeholder-text">点击上传健康证明</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="upload-item" bindtap="choosePetIdentityProof">
+        <view class="item-header">
+          <text class="item-title">宠物身份标识</text>
+          <text class="item-status {{petIdentityProof ? 'uploaded' : ''}}">
+            {{petIdentityProof ? '✓ 已上传' : '未上传'}}
+          </text>
+        </view>
+        <view class="upload-area {{petIdentityProof ? 'has-image' : ''}}">
+          <image wx:if="{{petIdentityProof}}" src="{{petIdentityProof}}" mode="aspectFill"></image>
+          <view wx:else class="upload-placeholder">
+            <text class="placeholder-icon">+</text>
+            <text class="placeholder-text">点击上传身份标识</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="submit-section">
+      <button 
+        class="submit-btn {{isReviewing ? 'reviewing' : ''}}" 
+        bindtap="startReview" 
+        disabled="{{!canSubmit || isReviewing}}"
+        loading="{{isReviewing}}"
+      >
+        <text wx:if="{{!canSubmit}}">请上传所有材料</text>
+        <text wx:elif="{{isReviewing}}">审核中...</text>
+        <text wx:else>开始AI智能审核</text>
+      </button>
+      
+      <view class="submit-tips">
+        <text class="submit-tip" wx:if="{{!canSubmit}}">请完成所有5项材料上传</text>
+        <text class="reviewing-tip" wx:if="{{isReviewing}}">AI正在审核中，请勿重复提交...</text>
+      </view>
+    </view>
   </view>
-  <view class="content">
-    <text>资质查询功能开发中...</text>
+
+  <!-- 步骤2: 审核进度 -->
+  <view class="progress-section" wx:if="{{currentStep === 2}}">
+    <view class="progress-header">
+      <text class="progress-title">AI智能审核中</text>
+      <text class="progress-desc">正在分析您提交的材料...</text>
+    </view>
+    
+    <view class="progress-container">
+      <view class="progress-bar">
+        <view class="progress-inner" style="{{'width: ' + reviewProgress + '%'}}"></view>
+      </view>
+      <text class="progress-text">{{reviewProgress}}%</text>
+    </view>
+    
+    <view class="task-display">
+      <text class="current-task">{{currentTask}}</text>
+    </view>
+    
+    <view class="progress-tip">
+      <text>审核过程可能需要1-2分钟，请耐心等待</text>
+    </view>
+  </view>
+
+  <!-- 步骤3: 审核结果 -->
+  <view class="result-section" wx:if="{{currentStep === 3}}">
+    <view class="result-header {{reviewResult.passed ? 'passed' : 'failed'}}">
+      <text class="result-icon">{{reviewResult.passed ? '✓' : '✗'}}</text>
+      <text class="result-title">{{reviewResult.passed ? '审核通过' : '审核未通过'}}</text>
+      <text class="result-summary">{{reviewResult.summary}}</text>
+    </view>
+    
+    <view class="detail-section">
+      <text class="detail-title">详细审核结果</text>
+      
+      <view class="detail-list">
+        <view class="detail-item {{item.passed ? 'passed' : 'failed'}}" 
+              wx:for="{{reviewResult.details}}" wx:key="type">
+          <view class="detail-header">
+            <text class="detail-type">{{item.type}}</text>
+            <text class="detail-status">{{item.passed ? '通过' : '未通过'}}</text>
+          </view>
+          <view class="detail-content">
+            <text class="detail-reason">{{item.reason}}</text>
+            <text class="detail-suggestion" wx:if="{{item.suggestion}}">
+              建议：{{item.suggestion}}
+            </text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="suggestion-section" wx:if="{{reviewResult.suggestion}}">
+      <text class="suggestion-title">综合建议</text>
+      <text class="suggestion-content">{{reviewResult.suggestion}}</text>
+    </view>
+
+    <view class="action-buttons">
+      <button class="restart-btn" bindtap="restartReview">重新审核</button>
+      <button class="save-btn" bindtap="saveResult" 
+              wx:if="{{reviewResult.passed}}">保存审核结果</button>
+    </view>
   </view>
 </view>

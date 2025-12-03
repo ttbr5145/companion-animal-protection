@@ -1,8 +1,40 @@
-<view class="container">
-  <view class="page-header">
-    <text class="page-title">监督举报板块</text>
-  </view>
-  <view class="content">
-    <text>监督举报功能开发中...</text>
-  </view>
+<view class="report-container">
+    <!-- 顶部递交举报按钮 -->
+    <view class="submit-section">
+        <button class="submit-btn" bindtap="gotoTicketSubmit">
+            <text class="btn-icon">+</text>
+            递交举报
+        </button>
+    </view>
+
+    <!-- 举报工单列表 -->
+    <view class="ticket-list">
+        <view wx:if="{{tickets.length === 0}}" class="empty-state">
+            <image src="/images/empty-report.png" class="empty-image"></image>
+            <text class="empty-text">暂无举报记录</text>
+            <text class="empty-tip">点击上方"递交举报"按钮提交您的第一份举报</text>
+        </view>
+
+        <view wx:else class="list-content">
+            <text class="list-title">我的举报记录 ({{tickets.length}})</text>
+            
+            <block wx:for="{{tickets}}" wx:key="_id">
+                <view class="ticket-item" data-id="{{item._id}}" bindtap="viewTicketDetail">
+                    <view class="ticket-header">
+                        <text class="ticket-title">{{item.title}}</text>
+                        <text class="ticket-status {{item.status}}">{{getStatusText(item.status)}}</text>
+                    </view>
+                    
+                    <view class="ticket-content">
+                        <text class="content-text">{{item.content}}</text>
+                    </view>
+                    
+                    <view class="ticket-footer">
+                        <text class="create-time">{{formatTime(item.createTime)}}</text>
+                        <text class="contact-info">{{item.contactInfo}}</text>
+                    </view>
+                </view>
+            </block>
+        </view>
+    </view>
 </view>

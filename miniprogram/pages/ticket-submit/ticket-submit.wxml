@@ -1,0 +1,88 @@
+<!-- pages/ticket-submit/ticket-submit.wxml -->
+<view class="container">
+  <form bindsubmit="formSubmit" bindreset="formReset">
+    
+    <!-- 工单类型 -->
+    <view class="form-item">
+      <view class="label">事件类型</view>
+      <picker range="{{types}}" value="{{typeIndex}}" bindchange="onTypeChange">
+        <view class="picker">{{types[typeIndex]}}</view>
+      </picker>
+    </view>
+
+    <!-- 提交者信息 -->
+    <view class="form-item">
+      <view class="label">联系方式</view>
+      <input 
+        name="contactInfo" 
+        value="{{contactInfo}}" 
+        placeholder="请输入您的联系方式" 
+        bindinput="onContactInput"
+      />
+    </view>
+
+    <!-- 标题 -->
+    <view class="form-item">
+      <view class="label">事件标题</view>
+      <input 
+        name="title" 
+        value="{{title}}" 
+        placeholder="请输入事件标题" 
+        bindinput="onTitleInput"
+      />
+    </view>
+
+    <!-- 描述 -->
+    <view class="form-item">
+      <view class="label">详细描述</view>
+      <textarea 
+        name="description" 
+        value="{{description}}" 
+        placeholder="请详细描述事件经过..." 
+        bindinput="onDescriptionInput"
+        maxlength="500"
+        show-confirm-bar="{{false}}"
+      />
+    </view>
+
+    <!-- 图片上传 -->
+    <view class="form-item">
+      <view class="label">现场照片（可选）</view>
+      <view class="image-upload">
+        <view class="image-list">
+          <block wx:for="{{images}}" wx:key="index">
+            <view class="image-item">
+              <image src="{{item}}" bindtap="previewImage" data-url="{{item}}"></image>
+              <view class="delete-btn" bindtap="deleteImage" data-index="{{index}}">×</view>
+            </view>
+          </block>
+          <view class="add-btn" bindtap="chooseImage" wx:if="{{images.length < 3}}">
+            <text>+</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 位置信息 -->
+    <view class="form-item">
+      <view class="label">事件位置（可选）</view>
+      <view class="location-section">
+        <view class="location-info" wx:if="{{location}}">
+          <text class="location-name">{{location.name}}</text>
+          <text class="location-address">{{location.address}}</text>
+          <text class="clear-location" bindtap="clearLocation">清除</text>
+        </view>
+        <button class="choose-location-btn" bindtap="chooseLocation" wx:else>
+          选择位置
+        </button>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="form-buttons">
+      <button form-type="reset" class="reset-btn">重置</button>
+      <button form-type="submit" class="submit-btn" loading="{{loading}}">提交工单</button>
+    </view>
+
+  </form>
+</view>

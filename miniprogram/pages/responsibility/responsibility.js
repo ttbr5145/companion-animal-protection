@@ -31,7 +31,7 @@ Page({
                 data: {
                     action: 'search',
                     query: this.data.query,
-                    top_k: 10
+                    top_k: 100
                 }
             });
             
