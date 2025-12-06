@@ -1,6 +1,9 @@
 {
     "usingComponents": {},
     "navigationBarTitleText": "工单列表",
+    "navigationBarTextStyle": "white",
+    "navigationBarBackgroundColor": "#007AFF",
     "enablePullDownRefresh": true,
-    "backgroundColor": "#f5f5f5"
+    "backgroundColor": "#f5f7fa",
+    "onReachBottomDistance": 50
   }

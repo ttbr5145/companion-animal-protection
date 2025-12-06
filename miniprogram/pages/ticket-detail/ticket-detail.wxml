@@ -1,71 +1,143 @@
 <!-- pages/ticket-detail/ticket-detail.wxml -->
 <view class="container">
-  <!-- 基本信息区域 -->
-  <view class="section">
-    <view class="section-title">基本信息</view>
-    <view class="info-item">
-      <text class="label">工单标题：</text>
-      <text class="value">{{ticket.title}}</text>
-    </view>
-    <view class="info-item">
-      <text class="label">提交者：</text>
-      <text class="value">{{ticket.submitterInfo.nickName}}</text>
-    </view>
-    <view class="info-item">
-      <text class="label">工单类型：</text>
-      <text class="value">{{typeText[ticket.type]}}</text>
-    </view>
-    <view class="info-item">
-      <text class="label">提交时间：</text>
-      <text class="value">{{ticket.submitTime}}</text>
-    </view>
-    <view class="info-item">
-      <text class="label">当前状态：</text>
-      <text class="status {{ticket.status}}">{{statusText[ticket.status]}}</text>
+  <!-- 状态栏 -->
+  <view class="status-bar" style="background-color: {{statusColor[ticket.status]}}">
+    <view class="status-content">
+      <text class="status-label">{{statusText[ticket.status]}}</text>
+      <text class="status-time" wx:if="{{ticket.relativeUpdateTime}}">更新于 {{ticket.relativeUpdateTime}}</text>
     </view>
   </view>
 
-  <!-- 问题描述区域 -->
-  <view class="section" wx:if="{{ticket.description}}">
-    <view class="section-title">问题描述</view>
-    <view class="description">{{ticket.description}}</view>
-  </view>
-
-  <!-- 现场图片区域 -->
-  <view class="section" wx:if="{{ticket.images && ticket.images.length}}">
-    <view class="section-title">现场图片</view>
-    <view class="images">
-      <block wx:for="{{ticket.images}}" wx:key="*this">
-        <image 
-          src="{{item}}" 
-          mode="aspectFill" 
-          data-url="{{item}}" 
-          bindtap="previewImage"
-          class="image-item"
-        ></image>
-      </block>
-    </view>
-  </view>
-
-  <!-- 位置信息区域 -->
-  <view class="section" wx:if="{{ticket.location}}">
-    <view class="section-title">位置信息</view>
-    <view class="location">
-      {{ticket.location.address}}
-      <view class="coordinates" wx:if="{{ticket.location.latitude}}">
-        坐标：{{ticket.location.latitude}}, {{ticket.location.longitude}}
+  <!-- 主要内容区域 -->
+  <scroll-view class="content" scroll-y>
+    <!-- 标题卡片 -->
+    <view class="card title-card">
+      <view class="card-header">
+        <view class="type-tag" style="background-color: {{statusColor[ticket.status]}}20; color: {{statusColor[ticket.status]}};">
+          {{typeText[ticket.type]}}
+        </view>
+        <text class="time">{{ticket.formattedSubmitTime}}</text>
+      </view>
+      <view class="title">{{ticket.title}}</view>
+      <view class="submitter" bindtap="contactSubmitter">
+        <image class="avatar" src="{{ticket.submitterInfo && ticket.submitterInfo.avatarUrl ? ticket.submitterInfo.avatarUrl : '/images/default-avatar.png'}}"></image>
+        <text class="nickname">{{ticket.submitterInfo && ticket.submitterInfo.nickName ? ticket.submitterInfo.nickName : '匿名用户'}}</text>
+        <text class="contact-icon">📞</text>
       </view>
     </view>
-  </view>
 
-  <!-- 管理员回复区域 -->
-  <view class="section" wx:if="{{ticket.adminReply}}">
-    <view class="section-title">管理员回复</view>
-    <view class="admin-reply">{{ticket.adminReply}}</view>
-  </view>
+    <!-- 问题描述 -->
+    <view class="card" wx:if="{{ticket.description}}">
+      <view class="card-title">
+        <view class="card-title-icon">📝</view>
+        <text>问题描述</text>
+      </view>
+      <view class="card-content">
+        <text class="description">{{ticket.description}}</text>
+      </view>
+    </view>
+
+    <!-- 现场图片 -->
+    <view class="card" wx:if="{{ticket.images && ticket.images.length}}">
+      <view class="card-title">
+        <view class="card-title-icon">🖼️</view>
+        <text>现场图片 ({{ticket.images.length}})</text>
+      </view>
+      <view class="images">
+        <block wx:for="{{ticket.images}}" wx:key="*this">
+          <view class="image-wrapper">
+            <image 
+              src="{{item}}" 
+              mode="aspectFill" 
+              data-url="{{item}}" 
+              bindtap="previewImage"
+              class="image-item"
+            ></image>
+            <view class="image-overlay" data-url="{{item}}" bindtap="previewImage">
+              <text class="preview-text">点击查看</text>
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 位置信息 -->
+    <view class="card" wx:if="{{ticket.location}}">
+      <view class="card-title">
+        <view class="card-title-icon">📍</view>
+        <text>位置信息</text>
+      </view>
+      <view class="card-content">
+        <view class="location-info">
+          <view class="address">{{ticket.location.address}}</view>
+          <view class="coordinates" wx:if="{{ticket.location.latitude}}">
+            <text>坐标：{{ticket.location.latitude}}, {{ticket.location.longitude}}</text>
+            <view class="coordinate-actions">
+              <button class="mini-btn copy-btn" bindtap="copyCoordinates">复制</button>
+              <button class="mini-btn navigate-btn" bindtap="navigateToLocation">导航</button>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 处理进度 -->
+    <view class="card" wx:if="{{ticket.processLogs && ticket.processLogs.length}}">
+      <view class="card-title">
+        <view class="card-title-icon">📋</view>
+        <text>处理进度</text>
+      </view>
+      <view class="process-timeline">
+        <block wx:for="{{ticket.processLogs}}" wx:key="index">
+          <view class="process-step {{index === 0 ? 'active' : ''}}">
+            <view class="step-dot"></view>
+            <view class="step-content">
+              <text class="step-title">{{item.action}}</text>
+              <text class="step-time">{{formatTime(item.time)}}</text>
+              <text class="step-operator" wx:if="{{item.operator}}">操作人：{{item.operator}}</text>
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 管理员回复 -->
+    <view class="card" wx:if="{{ticket.adminReply}}">
+      <view class="card-title">
+        <view class="card-title-icon">💬</view>
+        <text>管理员回复</text>
+      </view>
+      <view class="card-content">
+        <view class="admin-reply">
+          <view class="admin-avatar">👮</view>
+          <view class="reply-content">
+            <text class="reply-text">{{ticket.adminReply}}</text>
+            <text class="reply-time" wx:if="{{ticket.replyTime}}">{{formatTime(ticket.replyTime)}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 工单ID -->
+    <view class="card meta-card">
+      <view class="meta-info">
+        <text class="meta-label">工单ID：</text>
+        <text class="meta-value">{{ticketId}}</text>
+      </view>
+      <view class="meta-info">
+        <text class="meta-label">提交时间：</text>
+        <text class="meta-value">{{ticket.formattedSubmitTime}}</text>
+      </view>
+    </view>
+  </scroll-view>
 
   <!-- 操作按钮区域 -->
-  <view class="actions" wx:if="{{ticket.status === 'pending' || ticket.status === 'processing'}}">
-    <button class="btn cancel-btn" bindtap="cancelTicket">取消工单</button>
+  <view class="action-bar" wx:if="{{ticket.status === 'pending' || ticket.status === 'processing'}}">
+    <button class="btn cancel-btn" bindtap="cancelTicket" hover-class="btn-hover">
+      取消工单
+    </button>
+    <button class="btn share-btn" open-type="share" hover-class="btn-hover">
+      分享工单
+    </button>
   </view>
 </view>

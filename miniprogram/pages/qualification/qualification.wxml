@@ -1,108 +1,179 @@
 <!-- pages/qualification/qualification.wxml -->
 <view class="container">
+  <!-- 步骤指示器 -->
+  <view class="steps-container">
+    <view class="steps">
+      <block wx:for="{{steps}}" wx:key="number">
+        <view class="step-item {{item.active ? 'active' : ''}} {{item.number <= currentStep ? 'completed' : ''}}">
+          <view class="step-number">{{item.number}}</view>
+          <text class="step-title">{{item.title}}</text>
+          <view class="step-line" wx:if="{{index < steps.length - 1}}"></view>
+        </view>
+      </block>
+    </view>
+  </view>
+
   <!-- 步骤1: 材料上传 -->
   <view class="step-section" wx:if="{{currentStep === 1}}">
     <view class="step-header">
-      <text class="step-title">材料上传</text>
-      <text class="step-desc">请上传以下5项必需材料</text>
+      <text class="step-title">资质材料上传</text>
+      <text class="step-desc">请按要求上传以下证明材料，确保图片清晰完整</text>
     </view>
     
-    <view class="upload-list">
-      <view class="upload-item" bindtap="chooseIdentityCard">
-        <view class="item-header">
-          <text class="item-title">身份证明</text>
-          <text class="item-status {{identityCard ? 'uploaded' : ''}}">
-            {{identityCard ? '✓ 已上传' : '未上传'}}
-          </text>
-        </view>
-        <view class="upload-area {{identityCard ? 'has-image' : ''}}">
-          <image wx:if="{{identityCard}}" src="{{identityCard}}" mode="aspectFill"></image>
-          <view wx:else class="upload-placeholder">
-            <text class="placeholder-icon">+</text>
-            <text class="placeholder-text">点击上传身份证</text>
-          </view>
+    <view class="upload-grid">
+      <view class="upload-card {{fileStatus.identityCard.uploaded ? 'uploaded' : ''}}" 
+            bindtap="chooseIdentityCard">
+        <view class="upload-card-icon">🆔</view>
+        <text class="upload-card-title">身份证明</text>
+        <text class="upload-card-status">
+          {{fileStatus.identityCard.uploaded ? '✓ 已上传' : '点击上传'}}
+        </text>
+        <view class="upload-card-info" wx:if="{{fileStatus.identityCard.uploaded && fileStatus.identityCard.size}}">
+          <text class="upload-card-size">{{fileStatus.identityCard.size}}</text>
         </view>
       </view>
 
-      <view class="upload-item" bindtap="chooseResidenceProof">
-        <view class="item-header">
-          <text class="item-title">居住证明</text>
-          <text class="item-status {{residenceProof ? 'uploaded' : ''}}">
-            {{residenceProof ? '✓ 已上传' : '未上传'}}
-          </text>
-        </view>
-        <view class="upload-area {{residenceProof ? 'has-image' : ''}}">
-          <image wx:if="{{residenceProof}}" src="{{residenceProof}}" mode="aspectFill"></image>
-          <view wx:else class="upload-placeholder">
-            <text class="placeholder-icon">+</text>
-            <text class="placeholder-text">点击上传居住证明</text>
-          </view>
+      <view class="upload-card {{fileStatus.residenceProof.uploaded ? 'uploaded' : ''}}" 
+            bindtap="chooseResidenceProof">
+        <view class="upload-card-icon">🏠</view>
+        <text class="upload-card-title">居住证明</text>
+        <text class="upload-card-status">
+          {{fileStatus.residenceProof.uploaded ? '✓ 已上传' : '点击上传'}}
+        </text>
+        <view class="upload-card-info" wx:if="{{fileStatus.residenceProof.uploaded && fileStatus.residenceProof.size}}">
+          <text class="upload-card-size">{{fileStatus.residenceProof.size}}</text>
         </view>
       </view>
 
-      <view class="upload-item" bindtap="choosePetSourceProof">
-        <view class="item-header">
-          <text class="item-title">宠物来源证明</text>
-          <text class="item-status {{petSourceProof ? 'uploaded' : ''}}">
-            {{petSourceProof ? '✓ 已上传' : '未上传'}}
-          </text>
-        </view>
-        <view class="upload-area {{petSourceProof ? 'has-image' : ''}}">
-          <image wx:if="{{petSourceProof}}" src="{{petSourceProof}}" mode="aspectFill"></image>
-          <view wx:else class="upload-placeholder">
-            <text class="placeholder-icon">+</text>
-            <text class="placeholder-text">点击上传来源证明</text>
-          </view>
+      <view class="upload-card {{fileStatus.petSourceProof.uploaded ? 'uploaded' : ''}}" 
+            bindtap="choosePetSourceProof">
+        <view class="upload-card-icon">🛒</view>
+        <text class="upload-card-title">宠物来源证明</text>
+        <text class="upload-card-status">
+          {{fileStatus.petSourceProof.uploaded ? '✓ 已上传' : '点击上传'}}
+        </text>
+        <view class="upload-card-info" wx:if="{{fileStatus.petSourceProof.uploaded && fileStatus.petSourceProof.size}}">
+          <text class="upload-card-size">{{fileStatus.petSourceProof.size}}</text>
         </view>
       </view>
 
-      <view class="upload-item" bindtap="chooseHealthProof">
-        <view class="item-header">
-          <text class="item-title">健康证明</text>
-          <text class="item-status {{healthProof ? 'uploaded' : ''}}">
-            {{healthProof ? '✓ 已上传' : '未上传'}}
-          </text>
-        </view>
-        <view class="upload-area {{healthProof ? 'has-image' : ''}}">
-          <image wx:if="{{healthProof}}" src="{{healthProof}}" mode="aspectFill"></image>
-          <view wx:else class="upload-placeholder">
-            <text class="placeholder-icon">+</text>
-            <text class="placeholder-text">点击上传健康证明</text>
-          </view>
+      <view class="upload-card {{fileStatus.healthProof.uploaded ? 'uploaded' : ''}}" 
+            bindtap="chooseHealthProof">
+        <view class="upload-card-icon">🏥</view>
+        <text class="upload-card-title">健康证明</text>
+        <text class="upload-card-status">
+          {{fileStatus.healthProof.uploaded ? '✓ 已上传' : '点击上传'}}
+        </text>
+        <view class="upload-card-info" wx:if="{{fileStatus.healthProof.uploaded && fileStatus.healthProof.size}}">
+          <text class="upload-card-size">{{fileStatus.healthProof.size}}</text>
         </view>
       </view>
 
-      <view class="upload-item" bindtap="choosePetIdentityProof">
-        <view class="item-header">
-          <text class="item-title">宠物身份标识</text>
-          <text class="item-status {{petIdentityProof ? 'uploaded' : ''}}">
-            {{petIdentityProof ? '✓ 已上传' : '未上传'}}
-          </text>
+      <view class="upload-card {{fileStatus.petIdentityProof.uploaded ? 'uploaded' : ''}}" 
+            bindtap="choosePetIdentityProof">
+        <view class="upload-card-icon">🔖</view>
+        <text class="upload-card-title">宠物身份标识</text>
+        <text class="upload-card-status">
+          {{fileStatus.petIdentityProof.uploaded ? '✓ 已上传' : '点击上传'}}
+        </text>
+        <view class="upload-card-info" wx:if="{{fileStatus.petIdentityProof.uploaded && fileStatus.petIdentityProof.size}}">
+          <text class="upload-card-size">{{fileStatus.petIdentityProof.size}}</text>
         </view>
-        <view class="upload-area {{petIdentityProof ? 'has-image' : ''}}">
-          <image wx:if="{{petIdentityProof}}" src="{{petIdentityProof}}" mode="aspectFill"></image>
-          <view wx:else class="upload-placeholder">
-            <text class="placeholder-icon">+</text>
-            <text class="placeholder-text">点击上传身份标识</text>
+      </view>
+
+      <!-- 上传提示 -->
+      <view class="upload-tip-card">
+        <view class="upload-tip-icon">💡</view>
+        <view class="upload-tip-content">
+          <text class="upload-tip-title">上传提示</text>
+          <text class="upload-tip-desc">• 确保图片清晰可见</text>
+          <text class="upload-tip-desc">• 上传真实有效的证明文件</text>
+          <text class="upload-tip-desc">• 建议使用相机拍摄，避免模糊</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 修改为竖向排列的预览区域 -->
+    <view class="preview-section-vertical" wx:if="{{identityCard || residenceProof || petSourceProof || healthProof || petIdentityProof}}">
+      <text class="preview-title">上传预览</text>
+      <view class="preview-list">
+        <view class="preview-row" wx:if="{{identityCard}}" bindtap="chooseIdentityCard">
+          <image src="{{identityCard}}" mode="aspectFill" class="preview-image-vertical"></image>
+          <view class="preview-info">
+            <text class="preview-label-vertical">身份证明</text>
+            <text class="preview-size" wx:if="{{fileStatus.identityCard.size}}">{{fileStatus.identityCard.size}}</text>
           </view>
+          <view class="preview-arrow">›</view>
+        </view>
+        
+        <view class="preview-row" wx:if="{{residenceProof}}" bindtap="chooseResidenceProof">
+          <image src="{{residenceProof}}" mode="aspectFill" class="preview-image-vertical"></image>
+          <view class="preview-info">
+            <text class="preview-label-vertical">居住证明</text>
+            <text class="preview-size" wx:if="{{fileStatus.residenceProof.size}}">{{fileStatus.residenceProof.size}}</text>
+          </view>
+          <view class="preview-arrow">›</view>
+        </view>
+        
+        <view class="preview-row" wx:if="{{petSourceProof}}" bindtap="choosePetSourceProof">
+          <image src="{{petSourceProof}}" mode="aspectFill" class="preview-image-vertical"></image>
+          <view class="preview-info">
+            <text class="preview-label-vertical">来源证明</text>
+            <text class="preview-size" wx:if="{{fileStatus.petSourceProof.size}}">{{fileStatus.petSourceProof.size}}</text>
+          </view>
+          <view class="preview-arrow">›</view>
+        </view>
+        
+        <view class="preview-row" wx:if="{{healthProof}}" bindtap="chooseHealthProof">
+          <image src="{{healthProof}}" mode="aspectFill" class="preview-image-vertical"></image>
+          <view class="preview-info">
+            <text class="preview-label-vertical">健康证明</text>
+            <text class="preview-size" wx:if="{{fileStatus.healthProof.size}}">{{fileStatus.healthProof.size}}</text>
+          </view>
+          <view class="preview-arrow">›</view>
+        </view>
+        
+        <view class="preview-row" wx:if="{{petIdentityProof}}" bindtap="choosePetIdentityProof">
+          <image src="{{petIdentityProof}}" mode="aspectFill" class="preview-image-vertical"></image>
+          <view class="preview-info">
+            <text class="preview-label-vertical">身份标识</text>
+            <text class="preview-size" wx:if="{{fileStatus.petIdentityProof.size}}">{{fileStatus.petIdentityProof.size}}</text>
+          </view>
+          <view class="preview-arrow">›</view>
         </view>
       </view>
     </view>
 
     <view class="submit-section">
+      <!-- 进度指示器部分 -->
+      <view class="progress-indicator" wx:if="{{!canSubmit}}">
+        <text class="progress-text">上传进度</text>
+        <view class="progress-bar">
+          <view class="progress-fill" style="width: {{uploadProgressWidth}}%"></view>
+        </view>
+        <text class="progress-count">
+          {{uploadedCount || 0}}/5
+        </text>
+      </view>
+      
       <button 
-        class="submit-btn {{isReviewing ? 'reviewing' : ''}}" 
+        class="submit-btn {{isReviewing ? 'reviewing' : ''}} {{canSubmit ? 'active' : ''}}" 
         bindtap="startReview" 
         disabled="{{!canSubmit || isReviewing}}"
-        loading="{{isReviewing}}"
       >
-        <text wx:if="{{!canSubmit}}">请上传所有材料</text>
-        <text wx:elif="{{isReviewing}}">审核中...</text>
-        <text wx:else>开始AI智能审核</text>
+        <view class="submit-btn-content">
+          <text class="submit-btn-icon" wx:if="{{canSubmit}}">🤖</text>
+          <text class="submit-btn-text">
+            {{!canSubmit ? '请完成所有材料上传' : ''}}
+            {{canSubmit && !isReviewing ? '开始AI智能审核' : ''}}
+            {{isReviewing ? '审核中...' : ''}}
+          </text>
+          <view class="loading-spinner" wx:if="{{isReviewing}}"></view>
+        </view>
       </button>
       
       <view class="submit-tips">
-        <text class="submit-tip" wx:if="{{!canSubmit}}">请完成所有5项材料上传</text>
+        <text class="submit-tip" wx:if="{{!canSubmit}}">请完成所有5项材料上传后开始审核</text>
         <text class="reviewing-tip" wx:if="{{isReviewing}}">AI正在审核中，请勿重复提交...</text>
       </view>
     </view>
@@ -111,63 +182,120 @@
   <!-- 步骤2: 审核进度 -->
   <view class="progress-section" wx:if="{{currentStep === 2}}">
     <view class="progress-header">
+      <view class="progress-icon">🔍</view>
       <text class="progress-title">AI智能审核中</text>
-      <text class="progress-desc">正在分析您提交的材料...</text>
+      <text class="progress-desc">我们正在智能分析您提交的材料</text>
     </view>
     
     <view class="progress-container">
-      <view class="progress-bar">
-        <view class="progress-inner" style="{{'width: ' + reviewProgress + '%'}}"></view>
+      <view class="progress-visual">
+        <view class="progress-circle">
+          <view class="progress-circle-fill" style="transform: rotate({{reviewProgress * 3.6}}deg);"></view>
+          <view class="progress-circle-inner">
+            <text class="progress-percent">{{reviewProgress}}%</text>
+          </view>
+        </view>
       </view>
-      <text class="progress-text">{{reviewProgress}}%</text>
-    </view>
-    
-    <view class="task-display">
-      <text class="current-task">{{currentTask}}</text>
+      
+      <view class="progress-details">
+        <text class="current-task">{{currentTask}}</text>
+        <view class="progress-stages">
+          <view class="progress-stage {{reviewProgress >= 20 ? 'completed' : ''}}">材料验证</view>
+          <view class="progress-stage {{reviewProgress >= 50 ? 'completed' : ''}}">信息分析</view>
+          <view class="progress-stage {{reviewProgress >= 80 ? 'completed' : ''}}">结果生成</view>
+        </view>
+      </view>
     </view>
     
     <view class="progress-tip">
-      <text>审核过程可能需要1-2分钟，请耐心等待</text>
+      <view class="tip-icon">⏱️</view>
+      <view class="tip-content">
+        <text class="tip-title">审核进行中</text>
+        <text class="tip-desc">审核过程可能需要1-2分钟，请耐心等待</text>
+      </view>
     </view>
   </view>
 
   <!-- 步骤3: 审核结果 -->
   <view class="result-section" wx:if="{{currentStep === 3}}">
     <view class="result-header {{reviewResult.passed ? 'passed' : 'failed'}}">
-      <text class="result-icon">{{reviewResult.passed ? '✓' : '✗'}}</text>
+      <view class="result-icon-circle">
+        <text class="result-icon">{{reviewResult.passed ? '✓' : '✗'}}</text>
+      </view>
       <text class="result-title">{{reviewResult.passed ? '审核通过' : '审核未通过'}}</text>
       <text class="result-summary">{{reviewResult.summary}}</text>
+      
+      <!-- 评级显示 -->
+      <!-- 🎯 简化评级显示，直接显示数据 -->
+        <view class="rating-display">
+        <view class="rating-label" style="background-color: {{reviewResult.ratingColor}}">
+            <text class="rating-text">{{reviewResult.rating}}</text>
+        </view>
+        <view class="score-display">
+            <text class="score-number">{{reviewResult.ratingScore}}</text>
+            <text class="score-unit">分</text>
+        </view>
+        </view>
+      
+      <!-- 合格资质丝带 -->
+      <view class="result-ribbon {{reviewResult.passed ? 'passed' : 'failed'}}" 
+            wx:if="{{reviewResult.passed}}">
+        <text class="ribbon-text">合格资质</text>
+      </view>
     </view>
     
     <view class="detail-section">
-      <text class="detail-title">详细审核结果</text>
+      <view class="section-title">
+        <text class="title-text">详细审核结果</text>
+        <text class="title-sub">各项材料审核情况</text>
+      </view>
       
       <view class="detail-list">
-        <view class="detail-item {{item.passed ? 'passed' : 'failed'}}" 
-              wx:for="{{reviewResult.details}}" wx:key="type">
-          <view class="detail-header">
-            <text class="detail-type">{{item.type}}</text>
-            <text class="detail-status">{{item.passed ? '通过' : '未通过'}}</text>
+        <block wx:for="{{reviewResult.details}}" wx:key="type">
+          <view class="detail-item {{item.passed ? 'passed' : 'failed'}}">
+            <view class="detail-icon">
+              <text wx:if="{{item.type === '身份证明'}}">🆔</text>
+              <text wx:elif="{{item.type === '居住证明'}}">🏠</text>
+              <text wx:elif="{{item.type === '宠物来源证明'}}">🛒</text>
+              <text wx:elif="{{item.type === '健康防疫证明'}}">🏥</text>
+              <text wx:elif="{{item.type === '身份标识'}}">🔖</text>
+            </view>
+            <view class="detail-content">
+              <view class="detail-header">
+                <text class="detail-type">{{item.type}}</text>
+                <view class="detail-status {{item.passed ? 'passed' : 'failed'}}">
+                  <text class="status-dot"></text>
+                  <text class="status-text">{{item.passed ? '通过' : '未通过'}}</text>
+                </view>
+              </view>
+              <text class="detail-reason">{{item.reason}}</text>
+              <text class="detail-suggestion" wx:if="{{item.suggestion}}">
+                💡 {{item.suggestion}}
+              </text>
+            </view>
           </view>
-          <view class="detail-content">
-            <text class="detail-reason">{{item.reason}}</text>
-            <text class="detail-suggestion" wx:if="{{item.suggestion}}">
-              建议：{{item.suggestion}}
-            </text>
-          </view>
-        </view>
+        </block>
       </view>
     </view>
 
-    <view class="suggestion-section" wx:if="{{reviewResult.suggestion}}">
-      <text class="suggestion-title">综合建议</text>
+    <view class="suggestion-card" wx:if="{{reviewResult.suggestion}}">
+      <view class="suggestion-header">
+        <text class="suggestion-icon">💬</text>
+        <text class="suggestion-title">综合建议</text>
+      </view>
       <text class="suggestion-content">{{reviewResult.suggestion}}</text>
     </view>
 
     <view class="action-buttons">
-      <button class="restart-btn" bindtap="restartReview">重新审核</button>
-      <button class="save-btn" bindtap="saveResult" 
-              wx:if="{{reviewResult.passed}}">保存审核结果</button>
+      <button class="action-btn restart-btn" bindtap="restartReview">
+        <text class="btn-icon">🔄</text>
+        <text class="btn-text">重新审核</text>
+      </button>
+      <button class="action-btn save-btn" bindtap="saveResult" 
+              wx:if="{{reviewResult.passed}}">
+        <text class="btn-icon">💾</text>
+        <text class="btn-text">保存结果</text>
+      </button>
     </view>
   </view>
 </view>

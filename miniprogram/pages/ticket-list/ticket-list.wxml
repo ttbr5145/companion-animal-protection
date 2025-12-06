@@ -1,68 +1,180 @@
-<!-- ticket-list/ticket-list.wxml -->
+<!-- pages/ticket-list/ticket-list.wxml -->
 <view class="container">
-  <!-- 顶部操作栏 -->
-  <view class="header">
-    <view class="submit-btn" bindtap="toSubmit">
-      <text class="icon">+</text>
-      <text>提交工单</text>
+  <!-- 顶部状态栏背景 -->
+  <view class="status-bar-bg"></view>
+  
+  <!-- 筛选区域 -->
+  <view class="filter-section">
+    <view class="filter-header">
+      <text class="section-title">工单列表</text>
+      <view class="filter-actions">
+        <view class="refresh-btn" bindtap="refreshList" wx:if="{{!loading}}">
+          <text class="refresh-icon">🔄</text>
+        </view>
+        <view class="loading-spinner-mini" wx:if="{{loading}}"></view>
+      </view>
     </view>
     
-    <!-- 筛选条件 -->
+    <!-- 筛选器 -->
     <view class="filters">
-      <picker range="{{statusOptions}}" value="{{statusIndex}}" bindchange="statusChange">
-        <view class="filter-item {{statusIndex > 0 ? 'active' : ''}}">
-          {{statusOptions[statusIndex]}}
-        </view>
-      </picker>
+      <view class="filter-group">
+        <text class="filter-label">状态筛选</text>
+        <picker range="{{statusOptions}}" value="{{statusIndex}}" bindchange="statusChange">
+          <view class="filter-select {{statusIndex > 0 ? 'active' : ''}}" style="{{statusIndex > 0 ? 'border-color: ' + statusColors[statusOptions[statusIndex]] + '; color: ' + statusColors[statusOptions[statusIndex]] : ''}}">
+            <text class="filter-text">{{statusOptions[statusIndex]}}</text>
+            <text class="filter-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
       
-      <picker range="{{typeOptions}}" value="{{typeIndex}}" bindchange="typeChange">
-        <view class="filter-item {{typeIndex > 0 ? 'active' : ''}}">
-          {{typeOptions[typeIndex]}}
-        </view>
-      </picker>
+      <view class="filter-group">
+        <text class="filter-label">类型筛选</text>
+        <picker range="{{typeOptions}}" value="{{typeIndex}}" bindchange="typeChange">
+          <view class="filter-select {{typeIndex > 0 ? 'active' : ''}}">
+            <text class="filter-text">{{typeOptions[typeIndex]}}</text>
+            <text class="filter-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
     </view>
   </view>
 
   <!-- 工单列表 -->
-  <view class="ticket-list">
-    <view wx:for="{{tickets}}" wx:key="_id" class="ticket-item" bindtap="viewDetail" data-id="{{item._id}}">
-      <view class="ticket-header">
-        <view class="left">
-          <text class="type">{{item.type}}</text>
-          <text class="submitter">{{item.submitterInfo.nickName}}</text>
-        </view>
-        <text class="status {{item.status}}">{{statusText[item.status]}}</text>
-      </view>
-      
-      <view class="ticket-content">
-        <text class="title">{{item.title || '无标题'}}</text>
-        <text class="description">{{item.description}}</text>
-      </view>
-      
-      <view class="ticket-footer">
-        <text class="time">{{formatTime(item.submitTime)}}</text>
-        <view class="meta">
-          <text wx:if="{{item.images && item.images.length > 0}}" class="meta-item">📷 {{item.images.length}}</text>
-          <text wx:if="{{item.location}}" class="meta-item">📍</text>
+  <scroll-view class="ticket-list" scroll-y scroll-with-animation>
+    <!-- 操作按钮 -->
+    <view class="action-card">
+      <view class="action-content">
+        <text class="action-title">需要帮助？</text>
+        <text class="action-desc">点击下方按钮提交新的工单</text>
+        <view class="submit-btn-wrapper">
+          <button class="submit-btn" bindtap="toSubmit">
+            <view class="btn-content">
+              <text class="btn-icon">+</text>
+              <text class="btn-text">提交新工单</text>
+            </view>
+          </button>
         </view>
       </view>
     </view>
-    
+
+    <!-- 统计信息 -->
+    <view class="stats-card" wx:if="{{tickets.length > 0}}">
+      <view class="stats-content">
+        <text class="stats-text">当前显示 {{tickets.length}} 个工单</text>
+        <view class="stats-dot"></view>
+        <text class="stats-text" wx:if="{{statusIndex > 0}}">已筛选</text>
+      </view>
+    </view>
+
+    <!-- 工单卡片列表 -->
+    <view class="ticket-cards">
+      <block wx:for="{{tickets}}" wx:key="_id" wx:for-item="ticket">
+        <view 
+          class="ticket-card" 
+          id="card-{{ticket._id}}"
+          data-id="{{ticket._id}}"
+          bindtap="viewDetail"
+          style="border-left-color: {{ticket.statusColor}};"
+        >
+          <!-- 状态标签 -->
+          <view class="status-tag" style="background: linear-gradient(135deg, {{ticket.statusColor}}20, {{ticket.statusColor}}10); color: {{ticket.statusColor}};">
+            <text class="status-icon">
+              <text wx:if="{{ticket.status === 'pending'}}">⏳</text>
+              <text wx:elif="{{ticket.status === 'processing'}}">🔧</text>
+              <text wx:elif="{{ticket.status === 'completed'}}">✅</text>
+              <text wx:elif="{{ticket.status === 'cancelled'}}">❌</text>
+            </text>
+            <text class="status-text">{{statusText[ticket.status]}}</text>
+          </view>
+
+          <!-- 卡片内容 -->
+          <view class="card-content">
+            <!-- 标题和类型 -->
+            <view class="card-header">
+              <text class="ticket-title">{{ticket.title || '无标题'}}</text>
+              <view class="type-badge">{{ticket.type}}</view>
+            </view>
+
+            <!-- 描述 -->
+            <view class="card-body" wx:if="{{ticket.description}}">
+              <text class="ticket-description">{{ticket.description}}</text>
+            </view>
+
+            <!-- 元信息 -->
+            <view class="card-footer">
+              <view class="meta-info">
+                <view class="meta-item">
+                  <text class="meta-icon">👤</text>
+                  <text class="meta-text">{{ticket.submitterInfo && ticket.submitterInfo.nickName ? ticket.submitterInfo.nickName : '匿名用户'}}</text>
+                </view>
+                
+                <view class="meta-item">
+                  <text class="meta-icon">🕒</text>
+                  <text class="meta-text">{{ticket.relativeSubmitTime}}</text>
+                </view>
+              </view>
+
+              <view class="meta-icons">
+                <view class="meta-icon-item" wx:if="{{ticket.images && ticket.images.length > 0}}">
+                  <text class="meta-icon-img">📷</text>
+                  <text class="meta-icon-count">{{ticket.images.length}}</text>
+                </view>
+                
+                <view class="meta-icon-item" wx:if="{{ticket.location}}">
+                  <text class="meta-icon-location">📍</text>
+                </view>
+              </view>
+            </view>
+          </view>
+
+          <!-- 时间戳 -->
+          <view class="time-stamp">
+            <text class="time-text">{{ticket.formattedSubmitTime}}</text>
+          </view>
+        </view>
+      </block>
+    </view>
+
     <!-- 空状态 -->
-    <view wx:if="{{tickets.length === 0 && !loading}}" class="empty">
-      <image src="/images/empty-ticket.png" class="empty-image"></image>
-      <text class="empty-text">暂无工单</text>
-      <text class="empty-desc">点击上方按钮提交第一个工单</text>
+    <view class="empty-state" wx:if="{{tickets.length === 0 && !loading}}">
+      <view class="empty-content">
+        <view class="empty-icon">📋</view>
+        <text class="empty-title">暂无工单记录</text>
+        <text class="empty-desc">尝试修改筛选条件或提交新的工单</text>
+        <button class="empty-btn" bindtap="toSubmit">提交第一个工单</button>
+      </view>
     </view>
-    
-    <!-- 加载状态 -->
-    <view wx:if="{{loading}}" class="loading">
-      <text>加载中...</text>
+
+    <!-- 加载更多 -->
+    <view class="load-more-container" wx:if="{{hasMore}}">
+      <view class="load-more-btn" bindtap="loadMore" wx:if="{{!loading}}">
+        <text class="load-more-text">加载更多</text>
+        <text class="load-more-icon">↓</text>
+      </view>
+      <view class="loading-more" wx:if="{{loading}}">
+        <view class="loading-spinner-small"></view>
+        <text class="loading-text">加载中...</text>
+      </view>
+    </view>
+
+    <!-- 没有更多数据 -->
+    <view class="no-more" wx:if="{{!hasMore && tickets.length > 0}}">
+      <text class="no-more-text">— 没有更多工单了 —</text>
+    </view>
+  </scroll-view>
+
+  <!-- 浮动提交按钮 -->
+  <view class="floating-btn" bindtap="toSubmit" catchtouchstart="floatingTouchStart" catchtouchend="floatingTouchEnd">
+    <view class="floating-btn-inner">
+      <text class="floating-icon">+</text>
     </view>
   </view>
 
-  <!-- 加载更多 -->
-  <view wx:if="{{hasMore && !loading}}" class="load-more">
-    <text bindtap="loadMore">加载更多</text>
+  <!-- 加载遮罩 -->
+  <view class="loading-overlay" wx:if="{{loading && isRefreshing}}">
+    <view class="loading-content">
+      <view class="loading-spinner-large"></view>
+      <text class="loading-overlay-text">刷新中...</text>
+    </view>
   </view>
 </view>
