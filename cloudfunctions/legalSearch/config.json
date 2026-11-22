@@ -1,14 +1,14 @@
 {
-    "LEGAL_STAR_CONFIG": {
-      "BASE_URL": "https://api.law-star.com",
-      "APP_ID": "bZr-6775-0C247CFca23f08ab",
-      "APP_SECRET": "70298242cac2487EbB6E2189153181A0",
-      "ENDPOINTS": {
-        "GET_TOKEN": "/api/auth/login",
-        "VECTOR_QUERY": "/api/lawData/xlquery",
-        "LAW_DETAIL": "/api/lawData/detail"
-      },
-      "TIMEOUT": 60000,
-      "RETRY_ATTEMPTS": 2
-    }
+  "LEGAL_STAR_CONFIG": {
+    "BASE_URL": "https://api.law-star.com",
+    "APP_ID": "",
+    "APP_SECRET": "",
+    "ENDPOINTS": {
+      "GET_TOKEN": "/api/auth/login",
+      "VECTOR_QUERY": "/api/lawData/xlquery",
+      "LAW_DETAIL": "/api/lawData/detail"
+    },
+    "TIMEOUT": 60000,
+    "RETRY_ATTEMPTS": 2
   }
+}

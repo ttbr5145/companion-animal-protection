@@ -1,268 +1,331 @@
 // cloudfunctions/qualificationReview/index.js
+// 饲养资质材料审核：DeepSeek Chat API，可选视觉模型做图像核验
 const cloud = require('wx-server-sdk')
-const axios = require('axios');// 在文件顶部引入 axios
-cloud.init()
+const axios = require('axios')
 
-// DeepSeek API配置
-const DEEPSEEK_CONFIG = {
-  API_KEY: 'sk-26a9b922144d4cbdbfc0592432a1ccc5',
-  BASE_URL: 'https://api.deepseek.com',
-  ENDPOINTS: {
-    CHAT: '/chat/completions'
-  }
+cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
+
+const CONFIG = {
+  apiKey: process.env.DEEPSEEK_API_KEY || '',
+  baseUrl: process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com',
+  chatPath: '/chat/completions',
+  textModel: process.env.DEEPSEEK_MODEL || 'deepseek-chat',
+  visionModel: process.env.DEEPSEEK_VISION_MODEL || '',
+  timeout: Number(process.env.DEEPSEEK_TIMEOUT) || 25000,
+  maxImageBytes: Number(process.env.DEEPSEEK_MAX_IMAGE_BYTES) || 1536 * 1024
 }
 
-exports.main = async (event, context) => {
-    const { action, images, userInfo } = event;
-    console.log('收到审核请求，动作类型:', action);
-  
-    try {
-        switch (action) {
-        case 'review':
-            return await reviewQualification(images, userInfo)
-        case 'test':
-            return { success: true, message: '云函数连接正常' }
-        default:
-            return { 
-            success: false, 
-            error: '未知操作类型',
-            supported_actions: ['review', 'test']
-            }
-        }
-    } catch (error) {
-        console.error('资格审核云函数执行错误:', error);
-        // 返回结构化的错误信息，方便前端定位
-        return {
-          success: false,
-          error: `处理请求时发生错误: ${error.message}`,
-          error_code: 'FUNCTION_EXECUTION_ERROR',
-          debug_info: { // 仅在开发环境返回详细信息
-            action: action,
-            has_images: !!images,
-            image_types: images ? Object.keys(images) : []
-          }
-        };
-    }
-}
+const MATERIAL_RULES = [
+  { key: 'identityCard', type: '身份证明', standard: '饲养人身份证明，可体现完全民事行为能力' },
+  { key: 'residenceProof', type: '居住证明', standard: '固定住所证明，可体现独户居住条件' },
+  { key: 'petSourceProof', type: '宠物来源证明', standard: '合法来源凭证，如购买发票、领养协议、繁育资质' },
+  { key: 'healthProof', type: '健康防疫证明', standard: '免疫或检疫记录，且在有效期内' },
+  { key: 'petIdentityProof', type: '宠物身份标识', standard: '芯片、犬牌或登记编号等可溯源标识' }
+]
 
-// 审核资格
-async function reviewQualification(images, userInfo) {
-  // 验证图片存在
-  if (!images || Object.keys(images).length === 0) {
-    throw new Error('未提供审核图片')
-  }
-  
-  console.log('开始审核图片:', Object.keys(images))
-  
+const SYSTEM_PROMPT = [
+  '你是伴侣动物饲养资质审核助手，依据各地养犬与养宠管理规定审核用户提交的证明材料。',
+  '只依据用户消息中给出的材料清单和你实际看到的图像内容做判断，不得臆造未见过的材料信息。',
+  '严格输出 JSON，不要输出 JSON 以外的任何文字。'
+].join('')
+
+exports.main = async (event) => {
+  const { action = 'review', images = {}, userInfo = {}, result = {} } = event || {}
+
   try {
-    // 调用DeepSeek API进行审核
-    const reviewResult = await callDeepSeekReview(images)
-    
+    if (action === 'test') {
+      return {
+        success: true,
+        message: '云函数连接正常',
+        config: {
+          apiKeyConfigured: Boolean(CONFIG.apiKey),
+          textModel: CONFIG.textModel,
+          visionModel: CONFIG.visionModel || null
+        }
+      }
+    }
+
+    if (action === 'saveResult') {
+      return await saveResult(result, userInfo)
+    }
+
+    if (action !== 'review') {
+      return {
+        success: false,
+        error: `未知操作类型: ${action}`,
+        supported_actions: ['review', 'test', 'saveResult']
+      }
+    }
+
+    return await reviewQualification(images, userInfo)
+  } catch (error) {
+    console.error('资质审核云函数执行失败:', error.message)
+    return { success: false, error: error.message, error_code: error.code || 'REVIEW_FAILED' }
+  }
+}
+
+async function reviewQualification(images, userInfo) {
+  if (!CONFIG.apiKey) {
+    throw fail('未配置环境变量 DEEPSEEK_API_KEY', 'MISSING_API_KEY')
+  }
+
+  const materials = MATERIAL_RULES.map(rule => ({
+    key: rule.key,
+    type: rule.type,
+    standard: rule.standard,
+    fileID: (images && images[rule.key]) || ''
+  }))
+
+  const uploaded = materials.filter(item => item.fileID)
+  if (uploaded.length === 0) {
+    throw fail('没有收到任何材料', 'MISSING_MATERIALS')
+  }
+
+  const prompt = buildReviewPrompt(materials, userInfo)
+
+  if (CONFIG.visionModel) {
+    try {
+      const parts = await buildImageParts(uploaded)
+      if (parts.length > 0) {
+        const text = await requestCompletion(CONFIG.visionModel, buildVisionContent(prompt, parts))
+        return toReviewResult(text, materials, { imagesAnalyzed: true, model: CONFIG.visionModel })
+      }
+      console.warn('未能获取可用的图片内容，回退到文本初审')
+    } catch (error) {
+      console.error('视觉模型调用失败，回退到文本初审:', error.message)
+    }
+  }
+
+  const text = await requestCompletion(CONFIG.textModel, prompt)
+  return toReviewResult(text, materials, { imagesAnalyzed: false, model: CONFIG.textModel })
+}
+
+function buildReviewPrompt(materials, userInfo) {
+  const lines = materials.map(item => {
+    const status = item.fileID ? '已上传' : '未上传'
+    return `- ${item.type}：${status}；审核要点：${item.standard}`
+  })
+
+  const uploadedCount = materials.filter(item => item.fileID).length
+
+  return [
+    '请审核以下伴侣动物饲养资质材料。',
+    '',
+    '材料清单：',
+    ...lines,
+    '',
+    `已上传 ${uploadedCount}/${materials.length} 项。`,
+    `申请人：${describeApplicant(userInfo)}`,
+    '',
+    '输出 JSON，字段如下：',
+    '{',
+    '  "passed": true 或 false,',
+    '  "summary": "50 字以内总体结论",',
+    '  "score": 0 到 100 的整数,',
+    '  "details": [',
+    '    { "type": "材料类型", "passed": true 或 false, "reason": "判断依据", "suggestion": "整改建议，可为空" }',
+    '  ],',
+    '  "suggestion": "100 字以内综合建议"',
+    '}',
+    'details 必须覆盖上述 5 类材料。若你看不到图像内容，reason 中必须写明「未获取到图像，无法核验」，不得编造材料内容。'
+  ].join('\n')
+}
+
+function describeApplicant(userInfo) {
+  const profile = (userInfo && userInfo.userInfo) || {}
+  const parts = []
+  if (profile.nickName) parts.push(`昵称 ${profile.nickName}`)
+  if (Array.isArray(profile.region) && profile.region.length > 0) {
+    parts.push(`地区 ${profile.region.join(' ')}`)
+  }
+  return parts.join('；') || '未提供申请人信息'
+}
+
+async function requestCompletion(model, content) {
+  const response = await axios({
+    method: 'POST',
+    url: `${CONFIG.baseUrl}${CONFIG.chatPath}`,
+    headers: {
+      Authorization: `Bearer ${CONFIG.apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    data: {
+      model,
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content }
+      ],
+      stream: false,
+      temperature: 0.1,
+      max_tokens: 1200
+    },
+    timeout: CONFIG.timeout
+  })
+
+  const choice = response.data && response.data.choices && response.data.choices[0]
+  const text = choice && choice.message && choice.message.content
+  if (!text) throw fail('模型未返回有效内容', 'EMPTY_RESPONSE')
+  return text
+}
+
+function buildVisionContent(prompt, parts) {
+  return [{ type: 'text', text: prompt }].concat(parts)
+}
+
+async function buildImageParts(uploaded) {
+  const parts = []
+
+  for (const item of uploaded) {
+    try {
+      const res = await cloud.downloadFile({ fileID: item.fileID })
+      const buffer = res.fileContent
+      if (!buffer || buffer.length === 0) {
+        console.warn(`${item.type} 内容为空，跳过`)
+        continue
+      }
+      if (buffer.length > CONFIG.maxImageBytes) {
+        console.warn(`${item.type} 超过 ${CONFIG.maxImageBytes} 字节，跳过图像核验`)
+        continue
+      }
+      const base64 = Buffer.from(buffer).toString('base64')
+      parts.push({ type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64}` } })
+    } catch (error) {
+      console.error(`下载 ${item.type} 失败:`, error.message)
+    }
+  }
+
+  return parts
+}
+
+function toReviewResult(text, materials, meta) {
+  const missing = materials.filter(item => !item.fileID).map(item => item.type)
+  const uploadedCount = materials.length - missing.length
+  const completeness = Math.round((uploadedCount / materials.length) * 100)
+
+  if (!meta.imagesAnalyzed) {
     return {
       success: true,
-      data: reviewResult
-    }
-  } catch (error) {
-    console.error('审核过程出错:', error)
-    throw new Error(`审核失败: ${error.message}`)
-  }
-}
-
-// 在云函数中，确保超时设置合理
-async function callDeepSeekReview(images) {
-    try {
-      const response = await axios({
-        method: 'POST',
-        url: `${DEEPSEEK_CONFIG.BASE_URL}${DEEPSEEK_CONFIG.ENDPOINTS.CHAT}`,
-        headers: {
-          'Authorization': `Bearer ${DEEPSEEK_CONFIG.API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        data: {
-          model: 'deepseek-chat',
-          messages: [
-            {
-              role: 'system',
-              content: `你是一个专业的宠物饲养资格审核专家。请严格审核用户提供的证明材料，给出客观、专业的审核意见。
-
-审核标准：
-1. 身份证明 - 确认饲养人具备完全民事行为能力
-2. 居住证明 - 证明有固定住所，符合独户居住要求
-3. 宠物来源 - 确保来源合法，打击黑色产业链  
-4. 健康防疫 - 保障宠物和公众健康安全
-5. 身份标识 - 实现溯源管理，帮助走失宠物找回
-
-请以JSON格式返回审核结果。`
-            },
-            {
-              role: 'user',
-              content: prompt
-            }
-        ],
-        stream: false,
-        temperature: 0.1,
-        max_tokens: 1000 // 减少token数量加快响应
-      },
-      timeout: 25000 // 设置为25秒，小于云函数的30秒超时
-    });
-    return parseReviewResponse(response.data);
-  } catch (error) {
-    console.error('API调用失败:', error);
-    return getMockReviewResult();
-  }
-}
-
-
-
-// 构建审核提示词
-function buildReviewPrompt() {
-  return `请基于专业宠物饲养资格标准，审核以下5类证明材料：
-
-需要审核的材料类型：
-1. 身份证明文件 - 确认饲养人具备完全民事行为能力
-2. 居住情况证明 - 证明有固定住所，符合独户居住要求
-3. 宠物合法来源证明 - 确保来源合法，打击黑色产业链
-4. 宠物健康与防疫证明 - 保障宠物和公众健康安全  
-5. 宠物身份标识 - 实现溯源管理，帮助走失宠物找回
-
-请严格审核并返回以下格式的JSON响应：
-{
-  "passed": true/false,
-  "summary": "总体审核摘要（50字以内）",
-  "details": [
-    {
-      "type": "身份证明",
-      "passed": true/false,
-      "reason": "具体审核理由",
-      "suggestion": "改进建议（如不通过）"
-    },
-    {
-      "type": "居住证明", 
-      "passed": true/false,
-      "reason": "具体审核理由",
-      "suggestion": "改进建议"
-    },
-    {
-      "type": "宠物来源证明",
-      "passed": true/false, 
-      "reason": "具体审核理由",
-      "suggestion": "改进建议"
-    },
-    {
-      "type": "健康防疫证明",
-      "passed": true/false,
-      "reason": "具体审核理由", 
-      "suggestion": "改进建议"
-    },
-    {
-      "type": "身份标识",
-      "passed": true/false,
-      "reason": "具体审核理由",
-      "suggestion": "改进建议"
-    }
-  ],
-  "suggestion": "综合建议（100字以内）"
-}
-
-请确保响应是有效的JSON格式，不要包含其他内容。`
-}
-
-// 解析审核响应
-function parseReviewResponse(apiResponse) {
-    try {
-      console.log('开始解析API响应');
-      if (!apiResponse.choices || !apiResponse.choices[0]) {
-        throw new Error('API响应格式不正确，缺少choices字段');
+      data: {
+        passed: missing.length === 0,
+        summary: missing.length === 0
+          ? `材料 ${uploadedCount}/${materials.length} 已齐备，未做图像核验，需人工复核`
+          : `材料 ${uploadedCount}/${materials.length}，缺少 ${missing.join('、')}`,
+        details: materials.map(item => ({
+          type: item.type,
+          passed: Boolean(item.fileID),
+          reason: item.fileID ? '已收到材料，当前未配置视觉模型，未核验图像内容' : '未上传该材料',
+          suggestion: item.fileID ? '如需核验真伪，请配置视觉模型或转人工复核' : `请补充${item.type}`
+        })),
+        suggestion: missing.length === 0 ? '材料齐备，建议转人工复核后出具结论' : '补齐材料后重新提交',
+        score: completeness,
+        rating: '初筛',
+        ratingScore: completeness,
+        ratingColor: '#9ca3af',
+        verification: 'materials_only',
+        imagesAnalyzed: false,
+        model: meta.model,
+        missingMaterials: missing,
+        reviewedAt: new Date().toISOString()
       }
-  
-      let content = apiResponse.choices[0].message.content;
-      console.log('API返回原始内容:', content);
-  
-      // 增强的JSON提取：尝试匹配更宽松的JSON模式
-      let jsonMatch = content.match(/\{[\s\S]*\}/) || content.match(/\{.*\}/s);
-      if (jsonMatch) {
-        const jsonStr = jsonMatch[0].replace(/(\r\n|\n|\r)/gm, "").trim(); // 清理换行符
-        try {
-          const result = JSON.parse(jsonStr);
-          console.log('成功解析JSON结果');
-          return validateReviewResult(result);
-        } catch (parseError) {
-          console.error('解析提取到的JSON字符串失败:', parseError, '字符串内容:', jsonStr);
-        }
-      }
-      throw new Error('无法从响应中提取有效的JSON结构');
-  
-    } catch (error) {
-      console.error('解析响应彻底失败，使用模拟数据:', error);
-      return getMockReviewResult();
-    }
-}
-
-// 验证审核结果格式
-function validateReviewResult(result) {
-  const requiredFields = ['passed', 'summary', 'details']
-  for (let field of requiredFields) {
-    if (result[field] === undefined) {
-      throw new Error(`缺少必需字段: ${field}`)
     }
   }
-  
-  // 确保details是数组且包含5个项目
-  if (!Array.isArray(result.details) || result.details.length !== 5) {
-    result.details = getDefaultDetails()
-  }
-  
-  return result
-}
 
-// 获取默认的详情结构
-function getDefaultDetails() {
-  return [
-    { type: '身份证明', passed: false, reason: '待审核', suggestion: '' },
-    { type: '居住证明', passed: false, reason: '待审核', suggestion: '' },
-    { type: '宠物来源证明', passed: false, reason: '待审核', suggestion: '' },
-    { type: '健康防疫证明', passed: false, reason: '待审核', suggestion: '' },
-    { type: '身份标识', passed: false, reason: '待审核', suggestion: '' }
-  ]
-}
+  const parsed = parseModelJSON(text)
+  const score = clampScore(parsed.score)
+  const grade = ratingOf(score)
+  const details = normalizeDetails(parsed.details, materials)
+  const passed = missing.length === 0 && parsed.passed !== false && score >= 60
 
-// 模拟审核结果（用于测试）
-function getMockReviewResult() {
   return {
-    passed: Math.random() > 0.5,
-    summary: "AI智能审核完成，请查看详细结果",
-    details: [
-      {
-        type: "身份证明",
-        passed: true,
-        reason: "身份证信息清晰，符合完全民事行为能力要求",
-        suggestion: ""
-      },
-      {
-        type: "居住证明", 
-        passed: true,
-        reason: "房产证明真实有效，满足独户居住条件",
-        suggestion: ""
-      },
-      {
-        type: "宠物来源证明",
-        passed: true,
-        reason: "购买发票齐全，来源合法",
-        suggestion: ""
-      },
-      {
-        type: "健康防疫证明",
-        passed: true, 
-        reason: "狂犬病免疫证明在有效期内",
-        suggestion: ""
-      },
-      {
-        type: "身份标识",
-        passed: true,
-        reason: "电子芯片标识完整可读",
-        suggestion: ""
-      }
-    ],
-    suggestion: "所有材料符合要求，建议定期为宠物进行健康检查并遵守相关管理规定"
+    success: true,
+    data: {
+      passed,
+      summary: parsed.summary || (passed ? '材料符合饲养资质要求' : '材料需要进一步完善'),
+      details,
+      suggestion: parsed.suggestion || '',
+      score,
+      rating: grade.rating,
+      ratingScore: score,
+      ratingColor: grade.color,
+      verification: 'images_analyzed',
+      imagesAnalyzed: true,
+      model: meta.model,
+      missingMaterials: missing,
+      reviewedAt: new Date().toISOString()
+    }
   }
+}
+
+function normalizeDetails(details, materials) {
+  const source = Array.isArray(details) ? details : []
+
+  return materials.map(item => {
+    const hit = source.find(entry => entry && (entry.type === item.type || entry.type === item.key))
+    if (hit) {
+      return {
+        type: item.type,
+        passed: Boolean(hit.passed),
+        reason: hit.reason || '',
+        suggestion: hit.suggestion || ''
+      }
+    }
+    return {
+      type: item.type,
+      passed: false,
+      reason: '模型未返回该材料的审核结论',
+      suggestion: ''
+    }
+  })
+}
+
+function parseModelJSON(text) {
+  const cleaned = String(text || '').replace(/```json/gi, '').replace(/```/g, '').trim()
+  const start = cleaned.indexOf('{')
+  const end = cleaned.lastIndexOf('}')
+
+  if (start === -1 || end <= start) {
+    throw fail('模型返回内容不是有效 JSON', 'INVALID_MODEL_OUTPUT')
+  }
+
+  try {
+    return JSON.parse(cleaned.slice(start, end + 1))
+  } catch (error) {
+    throw fail('解析模型返回 JSON 失败', 'INVALID_MODEL_OUTPUT')
+  }
+}
+
+function clampScore(value) {
+  const num = Number(value)
+  if (!Number.isFinite(num)) return 0
+  return Math.max(0, Math.min(100, Math.round(num)))
+}
+
+function ratingOf(score) {
+  if (score >= 90) return { rating: '优', color: '#10b981' }
+  if (score >= 75) return { rating: '良', color: '#3b82f6' }
+  if (score >= 60) return { rating: '中', color: '#f59e0b' }
+  return { rating: '差', color: '#ef4444' }
+}
+
+async function saveResult(result, userInfo) {
+  if (!result || !result.details) throw fail('缺少审核结果', 'MISSING_RESULT')
+
+  const context = cloud.getWXContext()
+  const db = cloud.database()
+  const res = await db.collection('qualificationReviews').add({
+    data: {
+      openid: context.OPENID,
+      nickName: (userInfo && userInfo.userInfo && userInfo.userInfo.nickName) || '',
+      result,
+      createdAt: new Date()
+    }
+  })
+
+  return { success: true, data: { id: res._id } }
+}
+
+function fail(message, code) {
+  const error = new Error(message)
+  error.code = code
+  return error
 }
