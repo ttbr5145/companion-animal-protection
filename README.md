@@ -1,5 +1,7 @@
 # 伴侣动物保护平台
 
+![version](https://img.shields.io/badge/version-v1.0.0-4CAF50) ![license](https://img.shields.io/badge/license-MIT-blue) ![platform](https://img.shields.io/badge/platform-WeChat%20MiniProgram-07C160)
+
 面向伴侣动物（宠物）饲养场景的微信小程序：饲养前能查清自己该负什么责任，饲养中遇到虐待、遗弃、非法交易，能找到地方把线索递上去。
 
 原生小程序 + 微信云开发，AppID `wx713816f53bfe6b44`，云开发环境 `cloud1-5g88rmqa7bde7156`。
@@ -63,7 +65,9 @@ companion-animal-protection/
 │   └── *Comment*/                # 评论与点赞
 ├── project.config.json
 ├── project.private.config.json
-└── uploadCloudFunction.sh
+├── uploadCloudFunction.sh
+├── CHANGELOG.md
+└── LICENSE
 ```
 
 ## 快速开始
@@ -90,6 +94,12 @@ companion-animal-protection/
 
 **密钥不进仓库。** 用云函数环境变量注入，代码中以 `process.env.LEGAL_STAR_APP_ID`、`process.env.LEGAL_STAR_APP_SECRET`、`process.env.DEEPSEEK_API_KEY` 读取；`config.json` 只保留 Base URL 与端点路径。
 
+## 版本与发布
+
+- 当前版本 `v1.0.0`（2026-11-22），变更明细见 [CHANGELOG.md](CHANGELOG.md)
+- 发布分支 `develop`（仓库默认分支），发布标签 `v1.0.0`
+- 后续版本按语义化版本号递增：功能新增走 `1.x.0`，修复走 `1.x.y`
+
 ## 待完善
 
 - 资质审核还没把材料图片编码进请求体，模型看不到图；`callDeepSeekReview` 里的 `prompt` 变量也未定义，请求会失败并回落到模拟结果，需补上提示词构建与图片编码
@@ -99,4 +109,4 @@ companion-animal-protection/
 
 ## 许可证
 
-仓库暂未附带 LICENSE 文件；补充开源许可前，视为保留所有权利。
+[MIT](LICENSE) © 2026 吴桐（Wu Tong）
