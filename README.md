@@ -38,7 +38,7 @@
 
 ```
 companion-animal-protection/
-├── miniprogram/                  # 小程序主体
+├── miniprogram/                  # 小程序主体（miniprogramRoot）
 │   ├── app.js                    # 云开发初始化、静默登录、用户数据同步
 │   ├── app.json                  # 页面注册与 tabBar
 │   ├── app.wxss                  # 全局样式
@@ -57,12 +57,14 @@ companion-animal-protection/
 │       ├── postEdit/ postDetail/
 │       ├── login/ index/ about/ updateProfile/
 │       └── testLegal/            # 接口联调页
-├── cloudfunctions/               # 云函数
+├── cloudfunctions/               # 云函数（cloudfunctionRoot）
 │   ├── getOpenId/                # 登录：换取 openid
 │   ├── legalSearch/ httpRequest/ # 法律之星接口封装
 │   ├── qualificationReview/      # 资质审核
 │   ├── ticket-*/                 # 举报工单增查改
 │   └── *Comment*/                # 评论与点赞
+├── utils/                        # 根目录遗留工具函数，未被小程序引用
+├── wechatlogin/                  # 遗留云函数，未纳入 cloudfunctions/
 ├── project.config.json
 ├── project.private.config.json
 ├── uploadCloudFunction.sh
@@ -104,7 +106,7 @@ companion-animal-protection/
 
 - 资质审核还没把材料图片编码进请求体，模型看不到图；`callDeepSeekReview` 里的 `prompt` 变量也未定义，请求会失败并回落到模拟结果，需补上提示词构建与图片编码
 - 密钥目前仍是硬编码读取（`config.json` 与云函数常量），需迁移到环境变量
-- `pages/home`、`pages/support` 未在 `app.json` 注册，属脚手架遗留页面，可清理
+- `pages/home`、`pages/support` 未在 `app.json` 注册；根目录 `utils/`、`wechatlogin/` 也不在 `miniprogramRoot` / `cloudfunctionRoot` 内，均属脚手架遗留，可清理
 - 举报工单目前只有提交与查看，缺少后台审核端
 
 ## 许可证
